@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>支出与收入流水</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="../sayi-anime-theme.css?v=20260621-cream2" />
+    <link rel="stylesheet" href="../music-player.css?v=20260824b" />
+    <script defer src="../music-player.js?v=20260824b" data-page="flow"></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <!-- 左侧导航栏 -->
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-icon">流</div>
+          <div class="brand-text">
+            <h1>支出与收入流水</h1>
+            <p>周、月、年维度的收支分析</p>
+          </div>
+        </div>
+
+        <a class="back-link" href="/home.html?v=20260621-cream2">
+          <span class="arrow">←</span> 返回洒一的财务与投资
+        </a>
+
+        <div class="nav-section">
+          <div class="section-title">分析维度</div>
+          <div class="segmented-control">
+            <button class="segment-btn active" data-period="week">周</button>
+            <button class="segment-btn" data-period="month">月</button>
+            <button class="segment-btn" data-period="year">年</button>
+          </div>
+        </div>
+
+        <div class="nav-section">
+          <div class="section-title">选择周期</div>
+          <div class="date-picker-wrapper">
+            <input id="periodInput" type="date" class="date-input" />
+          </div>
+        </div>
+
+        <button id="syncBtn" class="btn-primary">
+          <span class="btn-icon">📱</span>
+          同步手机记账流水
+        </button>
+
+        <div class="nav-section codex-section">
+          <div class="section-title">Codex 分析接口</div>
+          <p class="section-desc">生成当前周期的分析包，包含同比、环比、异常分类和优化建议所需数据。</p>
+          <button id="analysisBtn" class="btn-secondary">生成分析包</button>
+          <button id="sendAnalysisBtn" class="btn-primary">发送到 Codex 工作区</button>
+          <button id="copyAnalysisBtn" class="btn-ghost">复制给 Codex</button>
+          <div id="analysisHint" class="action-hint">还没有生成分析包。</div>
+        </div>
+      </aside>
+
+      <!-- 右侧主内容区 -->
+      <main class="main-content">
+        <!-- 顶部信息栏 -->
+        <header class="top-bar">
+          <div class="top-bar-left">
+            <span class="tag">ASSET COCKPIT</span>
+            <h2 id="periodTitle">本周流水分析</h2>
+          </div>
+          <div class="top-bar-right">
+            <div class="user-info">
+              <div class="user-badge">
+                <span class="user-role">预算守卫</span>
+                <span class="user-status">LIVE · QUEST · RISK</span>
+              </div>
+              <div class="health-score">
+                <span class="score-label">财务健康度</span>
+                <span id="healthScore" class="score-value">--</span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- 关键指标卡片 -->
+        <section class="metrics-row">
+          <div class="metric-card income">
+            <div class="metric-header">
+              <span class="metric-dot"></span>
+              <span class="metric-label">收入</span>
+            </div>
+            <div class="metric-value" id="incomeTotal">¥0</div>
+            <div class="metric-count" id="incomeCount">0 笔</div>
+          </div>
+          <div class="metric-card expense">
+            <div class="metric-header">
+              <span class="metric-dot"></span>
+              <span class="metric-label">支出</span>
+            </div>
+            <div class="metric-value" id="expenseTotal">¥0</div>
+            <div class="metric-count" id="expenseCount">0 笔</div>
+          </div>
+          <div class="metric-card balance">
+            <div class="metric-header">
+              <span class="metric-dot"></span>
+              <span class="metric-label">结余</span>
+            </div>
+            <div class="metric-value" id="balanceTotal">¥0</div>
+            <div class="metric-count">收入 - 支出</div>
+          </div>
+          <div class="metric-card top-expense">
+            <div class="metric-header">
+              <span class="metric-dot"></span>
+              <span class="metric-label">最大支出</span>
+            </div>
+            <div class="metric-value" id="topExpenseMetric">--</div>
+            <div class="metric-count" id="topExpenseAmount">暂无</div>
+          </div>
+        </section>
+
+        <!-- 图表区域 -->
+        <section class="charts-section">
+          <div class="chart-card">
+            <div class="card-header">
+              <h3>支出分类饼图</h3>
+              <span id="pieSummary" class="card-tag">暂无数据</span>
+            </div>
+            <div class="chart-content">
+              <div class="chart-wrapper pie-wrapper">
+                <canvas id="expensePieChart"></canvas>
+                <div id="pieCenterText" class="pie-center-text">--</div>
+              </div>
+              <div id="expenseLegend" class="chart-legend"></div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="card-header">
+              <h3>收入支出趋势</h3>
+              <span class="card-tag">近7天/月/年</span>
+            </div>
+            <div class="chart-content">
+              <div class="chart-wrapper line-wrapper">
+                <canvas id="trendChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 排行与对比 -->
+        <section class="charts-section">
+          <div class="chart-card">
+            <div class="card-header">
+              <h3>最大支出项排行</h3>
+              <span id="rankSummary" class="card-tag">按金额排序</span>
+            </div>
+            <div id="expenseRank" class="rank-list"></div>
+          </div>
+
+          <div class="chart-card">
+            <div class="card-header">
+              <h3>周期对比</h3>
+              <span class="card-tag">环比 / 同比</span>
+            </div>
+            <div id="comparisonList" class="insight-list"></div>
+          </div>
+        </section>
+
+        <!-- 分析建议 -->
+        <section id="analysisSection" class="chart-card full-width">
+          <div class="card-header">
+            <h3>本地分析建议</h3>
+            <span id="insightSummary" class="card-tag">自动生成</span>
+          </div>
+          <div id="insightList" class="insight-list"></div>
+        </section>
+
+        <!-- 流水明细表格 -->
+        <section class="chart-card full-width">
+          <div class="card-header">
+            <h3>流水明细</h3>
+            <span id="transactionSummary" class="card-tag">0 条</span>
+          </div>
+          <div class="transaction-toolbar">
+            <div class="transaction-month-switcher" aria-label="明细月份">
+              <button id="detailPrevMonth" type="button" aria-label="上一个月">‹</button>
+              <label class="transaction-month-picker">
+                <input id="detailMonthInput" type="month" aria-label="选择明细月份" />
+                <strong id="detailMonthLabel">本月</strong>
+              </label>
+              <button id="detailNextMonth" type="button" aria-label="下一个月">›</button>
+            </div>
+            <div class="transaction-type-filter" role="tablist" aria-label="明细收支筛选">
+              <button class="transaction-filter-btn active" type="button" data-transaction-type="all">全部</button>
+              <button class="transaction-filter-btn" type="button" data-transaction-type="expense">支出</button>
+              <button class="transaction-filter-btn" type="button" data-transaction-type="income">收入</button>
+            </div>
+            <span id="transactionAmountSummary" class="transaction-amount-summary"></span>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>日期</th>
+                  <th>类型</th>
+                  <th>分类</th>
+                  <th>来源 / 账户</th>
+                  <th>备注</th>
+                  <th class="amount-col">金额</th>
+                </tr>
+              </thead>
+              <tbody id="transactionTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Codex 分析包 -->
+        <section class="chart-card full-width">
+          <div class="card-header">
+            <h3>Codex 分析包</h3>
+            <span id="analysisStatus" class="card-tag">尚未生成</span>
+          </div>
+          <textarea id="analysisPayload" class="analysis-textarea" readonly placeholder="点击“生成分析包”后，这里会出现可复制给 Codex 的分析数据。"></textarea>
+        </section>
+      </main>
+    </div>
+
+    <script src="../site-auto-backup.js"></script>
+    <script src="./app.js?v=20260905-detail-month-filter"></script>
+  </body>
+</html>

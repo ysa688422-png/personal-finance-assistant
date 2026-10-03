@@ -1,0 +1,41 @@
+{
+  "name": "洒一投资工具箱",
+  "short_name": "洒一投资",
+  "description": "股票持仓管理、开户奖励记录、港股打新、日内期权交易记录 - 洒一二次元投资工具箱",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#ff6b9d",
+  "orientation": "portrait",
+  "scope": ".",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "../品牌资产/sayi-finance-app-icon.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": [
+    "finance",
+    "productivity",
+    "utilities"
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "screenshot2.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#ffdc42" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="手机记账" />
+    <title>手机记账</title>
+    <link rel="manifest" href="./manifest.json?v=20260905-delete-sync" />
+    <link rel="apple-touch-icon" href="./icon.svg" />
+    <link rel="stylesheet" href="./styles.css?v=20260905-delete-sync" />
+    <link rel="stylesheet" href="../sayi-anime-theme.css?v=20260905-delete-sync" />
+  </head>
+  <body>
+    <main class="phone-app">
+      <section id="ledgerView" class="view active" aria-label="明细">
+        <header class="summary-header">
+          <div class="status-spacer" aria-hidden="true"></div>
+          <div class="title-row">
+            <span class="face-mark" aria-hidden="true"></span>
+            <h1>手机记账</h1>
+            <button id="openExportBtn" class="icon-button" type="button" aria-label="导出">
+              <span class="icon export" aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="month-summary">
+            <label class="month-select">
+              <span id="yearLabel">2026年</span>
+              <input id="monthInput" type="month" />
+              <strong id="monthLabel">05月</strong>
+            </label>
+            <div>
+              <span>收入</span>
+              <strong id="incomeTotal">0.00</strong>
+            </div>
+            <div>
+              <span>支出</span>
+              <strong id="expenseTotal">0.00</strong>
+            </div>
+          </div>
+          <nav class="quick-tools" aria-label="快捷功能">
+            <button class="tool-button" type="button" data-open="ledger">
+              <span class="icon receipt" aria-hidden="true"></span>
+              <span>账单</span>
+            </button>
+            <button class="tool-button" type="button" data-open="budget">
+              <span class="icon wallet" aria-hidden="true"></span>
+              <span>预算</span>
+            </button>
+            <button class="tool-button" type="button" data-open="assets">
+              <span class="icon shield" aria-hidden="true"></span>
+              <span>资产管家</span>
+            </button>
+            <button class="tool-button" type="button" data-open="export">
+              <span class="icon bag" aria-hidden="true"></span>
+              <span>月度导出</span>
+            </button>
+            <button class="tool-button" type="button" data-open="more">
+              <span class="icon more" aria-hidden="true"></span>
+              <span>更多</span>
+            </button>
+          </nav>
+        </header>
+
+        <section id="dayList" class="day-list" aria-live="polite"></section>
+      </section>
+
+      <section id="chartView" class="view" aria-label="图表">
+        <header class="chart-header">
+          <div class="chart-title-row">
+            <label class="chart-type-select">
+              <select id="chartTypeSelect" aria-label="图表类型">
+                <option value="expense">支出</option>
+                <option value="income">收入</option>
+              </select>
+              <strong id="chartTypeLabel">支出</strong>
+            </label>
+          </div>
+          <div class="range-tabs" role="tablist" aria-label="图表周期">
+            <button class="range-tab active" type="button" data-range="week">周</button>
+            <button class="range-tab" type="button" data-range="month">月</button>
+            <button class="range-tab" type="button" data-range="year">年</button>
+          </div>
+        </header>
+        <nav id="periodTabs" class="period-tabs" aria-label="周期切换"></nav>
+        <section class="trend-panel">
+          <div class="trend-summary">
+            <p id="chartTotal">总支出：0.00</p>
+            <p id="chartAverage">平均值：0.00</p>
+          </div>
+          <div id="lineChart" class="line-chart"></div>
+        </section>
+        <section class="ranking-panel">
+          <h2 id="rankingTitle">支出排行榜</h2>
+          <div id="categoryChart" class="ranking-list"></div>
+        </section>
+      </section>
+
+      <section id="settingsView" class="view" aria-label="我的">
+        <header class="plain-header">
+          <h2>我的</h2>
+          <p>数据只保存在这台手机的浏览器本地。</p>
+        </header>
+        <div class="settings-list">
+          <a id="homeLink" class="settings-item" href="../index.html">
+            <span class="icon home" aria-hidden="true"></span>
+            <span>返回洒一的财务与投资</span>
+          </a>
+          <div class="sync-card">
+            <div>
+              <strong>电脑同步</strong>
+              <span id="syncStatus">等待同步</span>
+            </div>
+            <button id="syncNowBtn" class="sync-button" type="button">立即同步</button>
+          </div>
+          <div class="sync-card sync-address-card">
+            <div>
+              <strong>当前电脑接收地址</strong>
+              <span id="computerReceiveAddress">正在识别...</span>
+            </div>
+            <button id="copyReceiveAddressBtn" class="sync-button" type="button">复制</button>
+          </div>
+          <div class="sync-card">
+            <div>
+              <strong>离线可用</strong>
+              <span id="offlineStatus">正在检查离线缓存</span>
+            </div>
+            <button id="offlineCheckBtn" class="sync-button" type="button">检查</button>
+          </div>
+          <label class="sync-field">
+            <span>电脑接收地址</span>
+            <input id="syncUrlInput" type="url" placeholder="例如 https://电脑局域网地址:4175" />
+          </label>
+          <button id="syncTestBtn" class="settings-item" type="button">
+            <span class="icon shield" aria-hidden="true"></span>
+            <span>测试电脑连接</span>
+          </button>
+          <button id="exportJsonBtn" class="settings-item" type="button">
+            <span class="icon export" aria-hidden="true"></span>
+            <span>导出本月 JSON</span>
+          </button>
+          <button id="exportCsvBtn" class="settings-item" type="button">
+            <span class="icon receipt" aria-hidden="true"></span>
+            <span>导出本月 CSV</span>
+          </button>
+          <label class="settings-item file-item">
+            <span class="icon wallet" aria-hidden="true"></span>
+            <span>从 JSON 恢复</span>
+            <input id="importFile" type="file" accept=".json" />
+          </label>
+          <button id="installGuideBtn" class="settings-item" type="button">
+            <span class="icon phone" aria-hidden="true"></span>
+            <span>添加到苹果手机桌面</span>
+          </button>
+          <button id="syncGuideBtn" class="settings-item" type="button">
+            <span class="icon shield" aria-hidden="true"></span>
+            <span>离线和自动同步说明</span>
+          </button>
+          <button id="clearDataBtn" class="settings-item danger" type="button">
+            <span class="icon trash" aria-hidden="true"></span>
+            <span>清空本地数据</span>
+          </button>
+        </div>
+      </section>
+
+      <nav class="bottom-nav" aria-label="底部导航">
+        <button class="nav-button active" type="button" data-view="ledgerView">
+          <span class="icon list" aria-hidden="true"></span>
+          <span>明细</span>
+        </button>
+        <button class="nav-button" type="button" data-view="chartView">
+          <span class="icon trend" aria-hidden="true"></span>
+          <span>图表</span>
+        </button>
+        <button id="addRecordBtn" class="add-button" type="button" aria-label="记账">
+          <span aria-hidden="true">+</span>
+          <small>记账</small>
+        </button>
+        <button class="nav-button" type="button" data-view="settingsView">
+          <span class="icon compass" aria-hidden="true"></span>
+          <span>发现</span>
+        </button>
+        <button class="nav-button" type="button" data-view="settingsView">
+          <span class="icon user" aria-hidden="true"></span>
+          <span>我的</span>
+        </button>
+      </nav>
+    </main>
+
+    <section id="entrySheet" class="sheet" aria-hidden="true" aria-label="新增记账">
+      <div class="sheet-panel">
+        <header class="entry-topbar">
+          <button id="cancelEntryBtn" type="button">取消</button>
+          <div class="type-tabs" role="tablist" aria-label="收支类型">
+            <button class="type-tab active" type="button" data-type="expense">支出</button>
+            <button class="type-tab" type="button" data-type="income">收入</button>
+          </div>
+          <button id="saveEntryTopBtn" type="button">保存</button>
+        </header>
+
+        <div id="categoryGrid" class="category-grid"></div>
+
+        <section class="amount-panel">
+          <output id="amountDisplay" class="amount-display">0.00</output>
+          <input id="noteInput" class="note-input" type="text" placeholder="备注：点击填写备注" />
+          <button id="deleteEntryBtn" class="delete-entry-button" type="button" hidden>删除这笔记录</button>
+          <button id="quickSaveEntryBtn" class="quick-save-entry-button" type="button">保存本笔</button>
+          <div class="keypad" aria-label="数字键盘">
+            <button type="button" data-key="7">7</button>
+            <button type="button" data-key="8">8</button>
+            <button type="button" data-key="9">9</button>
+            <button class="date-key" type="button" data-key="date">
+              <input id="dateInput" type="date" />
+              <span>今天</span>
+            </button>
+            <button type="button" data-key="4">4</button>
+            <button type="button" data-key="5">5</button>
+            <button type="button" data-key="6">6</button>
+            <button type="button" data-key="+">+</button>
+            <button type="button" data-key="1">1</button>
+            <button type="button" data-key="2">2</button>
+            <button type="button" data-key="3">3</button>
+            <button type="button" data-key="-">-</button>
+            <button type="button" data-key=".">.</button>
+            <button type="button" data-key="0">0</button>
+            <button type="button" data-key="back">⌫</button>
+            <button class="done-key" type="button" data-key="done">完成</button>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section id="modal" class="modal" aria-hidden="true">
+      <div class="modal-card">
+        <h2 id="modalTitle">提示</h2>
+        <p id="modalBody"></p>
+        <button id="modalCloseBtn" class="primary-action" type="button">知道了</button>
+      </div>
+    </section>
+
+    <script src="../site-auto-backup.js"></script>
+    <script src="./app.js?v=20260905-delete-sync"></script>
+  </body>
+</html>

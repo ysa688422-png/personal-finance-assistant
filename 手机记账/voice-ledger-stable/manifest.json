@@ -1,0 +1,17 @@
+{
+  "name": "洒一手机记账",
+  "short_name": "手机记账",
+  "start_url": "./index.html?app=mobile-ledger",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fff8fb",
+  "theme_color": "#ffdc42",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "../icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}

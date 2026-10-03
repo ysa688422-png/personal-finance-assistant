@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>洒一 · 个人财务助理</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="music-player.css?v=20260824b">
+  <script defer src="music-player.js?v=20260824b" data-page="assistant"></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand-group">
+        <button class="history-toggle" id="historyToggle" type="button" aria-label="打开历史对话" aria-expanded="false">☰</button>
+        <div class="brand"><img class="brand-avatar" src="sayi-finance-mascot.png" alt=""><span><strong>洒一</strong>财务助理</span></div>
+        <a class="home-link" href="http://localhost:4176/home.html" aria-label="返回洒一的财务与投资"><span aria-hidden="true">←</span> 返回财务与投资</a>
+      </div>
+      <div class="status" id="statusText"><i></i>正在检查本地数据</div>
+    </header>
+
+    <main class="app-frame">
+      <div class="history-scrim" id="historyScrim"></div>
+      <aside class="history-rail" id="historyRail" aria-label="历史对话">
+        <div class="history-head">
+          <div>
+            <div class="section-label">历史对话</div>
+            <p>本机留存</p>
+          </div>
+          <button class="new-chat-button" id="newConversationButton" type="button"><span>＋</span> 新对话</button>
+        </div>
+        <nav class="conversation-list" id="conversationList">
+          <div class="conversation-empty">正在读取历史对话…</div>
+        </nav>
+        <p class="history-note">对话与财务资料都只保存在这台电脑。</p>
+      </aside>
+
+      <div class="primary-column" id="primaryColumn">
+        <section class="hero" id="emptyState">
+          <div class="hero-copy">
+            <p class="eyebrow">SAYI · LOCAL FINANCE</p>
+            <h1>今天也把钱<br>安排得明明白白。</h1>
+            <p class="intro">我会分析你的收支、预算、非投资资产、负债和现金流。资料只留在这台电脑，安心聊就好。</p>
+          </div>
+          <div class="hero-mascot" aria-hidden="true">
+            <img src="sayi-finance-mascot.png" alt="">
+            <span>本机分析中</span>
+          </div>
+        </section>
+
+        <section class="chat-surface" id="chatSurface" aria-live="polite">
+          <header class="conversation-heading" id="conversationHeading">
+            <div>
+              <div class="section-label">当前对话</div>
+              <h2 id="conversationTitle">新对话</h2>
+            </div>
+            <span id="conversationUpdated"></span>
+          </header>
+          <div class="transcript" id="transcript"></div>
+          <form class="ask" id="chatForm">
+            <textarea id="messageInput" rows="3" placeholder="例如：分析 2026 年 7 月的收支，有什么异常？"></textarea>
+            <button type="submit" id="sendButton">开始分析 <span>↗</span></button>
+          </form>
+          <div class="quick-prompts" id="quickPrompts">
+            <button data-question="分析最近一个月的收支和结余，并指出最大支出分类。">最近一月收支</button>
+            <button data-question="根据现有非投资资产和负债，说明我的现金流风险。">资产与负债</button>
+            <button data-question="数据目前覆盖到什么时候？有哪些缺失或冲突？">数据完整性</button>
+          </div>
+        </section>
+
+        <section class="control-strip">
+          <button class="control active" data-panel="dataPanel"><span>数据</span><strong id="dataRange">—</strong></button>
+          <button class="control" data-panel="repairPanel"><span>修正</span><strong>确认后写回</strong></button>
+          <button class="control disabled" disabled><span>投资</span><strong>未启用</strong></button>
+        </section>
+
+        <section class="drawer" id="dataPanel">
+          <div><span>流水</span><strong id="txCount">—</strong></div>
+          <div><span>数据源</span><strong id="sourceCount">—</strong></div>
+          <div><span>冲突</span><strong id="conflictCount">—</strong></div>
+          <div><span>已排除</span><strong id="excludedCount">—</strong></div>
+          <button id="syncButton" class="text-button">立即增量更新</button>
+        </section>
+
+        <section class="drawer hidden repair" id="repairPanel">
+          <div class="repair-head">
+            <div><div class="section-label">数据修正</div><p>先查找记录，再生成修改建议。没有点“确认写回”前，原始文件不会变化。</p></div>
+            <button class="text-button" id="refreshProposals">查看修改记录</button>
+          </div>
+          <div class="search-row">
+            <input id="txSearch" placeholder="日期、分类或备注">
+            <input id="txMonth" type="month">
+            <button id="txSearchButton">查找</button>
+          </div>
+          <div class="tx-results" id="txResults"></div>
+          <form class="proposal-form hidden" id="proposalForm">
+            <input type="hidden" id="proposalIdentity">
+            <div class="selected-record" id="selectedRecord"></div>
+            <label>修改字段<select id="proposalField"><option value="category">分类</option><option value="note">备注</option><option value="amount">金额</option><option value="date">日期</option><option value="type">收支类型</option></select></label>
+            <label>新值<input id="proposalValue" required></label>
+            <label>原因<input id="proposalReason" required placeholder="例如：原分类误选"></label>
+            <button type="submit">生成修改建议</button>
+          </form>
+          <div id="proposalList" class="proposal-list"></div>
+        </section>
+      </div>
+    </main>
+    <footer>Ollama · Qwen3.5 9B · 本机运行</footer>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

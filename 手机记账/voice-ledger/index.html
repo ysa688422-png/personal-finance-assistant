@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#ffdc42" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="语音记账" />
+    <title>手机语音记账</title>
+    <link rel="manifest" href="./manifest.json?v=recognition-fix-20261002" />
+    <link rel="apple-touch-icon" href="../icon.svg" />
+    <link rel="stylesheet" href="./styles.css?v=recognition-fix-20261002" />
+  </head>
+  <body>
+    <main class="voice-app">
+      <header class="app-header">
+        <a class="back-link" href="/home.html" aria-label="返回洒一的财务与投资">←</a>
+        <div>
+          <p>洒一 · 正式账本</p>
+          <h1>手机记账</h1>
+        </div>
+        <span class="beta-badge">正式版</span>
+      </header>
+
+      <section class="summary-band" aria-label="支出汇总">
+        <div class="summary-intro">
+          <span id="summaryDate">2026年8月</span>
+          <strong>我的账本</strong>
+          <button id="voiceShortcut" class="voice-shortcut" type="button"><span class="mini-mic" aria-hidden="true"></span>语音记一笔</button>
+        </div>
+        <div class="summary-cell today"><span>今天支出</span><strong id="todayExpense">¥0.00</strong></div>
+        <div class="summary-cell month"><span>本月支出</span><strong id="monthExpense">¥0.00</strong></div>
+        <div class="summary-cell year"><span>今年支出</span><strong id="yearExpense">¥0.00</strong></div>
+        <div class="summary-cell income"><span>本月收入</span><strong id="monthIncome">¥0.00</strong></div>
+      </section>
+
+      <nav class="workspace-tabs" aria-label="账本视图">
+        <button class="workspace-tab active" type="button" data-view="voiceView">记账</button>
+        <button class="workspace-tab" type="button" data-view="detailsView">明细</button>
+        <button class="workspace-tab" type="button" data-view="chartsView">统计报表</button>
+        <button class="workspace-tab" type="button" data-view="settingsView">我的</button>
+      </nav>
+
+      <section id="detailsView" class="dashboard-view" aria-labelledby="testLedgerTitle" hidden>
+        <div class="details-grid">
+          <div class="ledger-column">
+            <div class="panel-heading ledger-heading">
+              <div>
+                <span class="section-kicker">与原手机记账共用数据</span>
+                <h2 id="testLedgerTitle">本月明细</h2>
+              </div>
+              <button id="refreshRecordsButton" class="text-action" type="button">同步刷新</button>
+            </div>
+            <div class="detail-controls">
+              <div class="detail-month-pager" aria-label="明细月份">
+                <button id="detailPrevMonth" type="button" aria-label="上一个月">‹</button>
+                <button id="detailMonthPickerButton" class="detail-month-picker" type="button" aria-label="选择明细月份" aria-haspopup="dialog">
+                  <strong id="detailMonthLabel">本月</strong>
+                  <span aria-hidden="true">▦</span>
+                </button>
+                <button id="detailNextMonth" type="button" aria-label="下一个月">›</button>
+              </div>
+              <div class="detail-type-tabs" role="tablist" aria-label="明细收支筛选">
+                <button class="detail-type-tab active" type="button" data-detail-type="all">全部</button>
+                <button class="detail-type-tab" type="button" data-detail-type="expense">支出</button>
+                <button class="detail-type-tab" type="button" data-detail-type="income">收入</button>
+              </div>
+            </div>
+            <section class="detail-search" aria-labelledby="detailSearchTitle">
+              <div class="detail-search-heading"><h3 id="detailSearchTitle">搜索明细</h3><button id="detailSearchClear" class="text-action" type="button" hidden>清除搜索</button></div>
+              <form id="detailSearchForm" class="detail-search-form" role="search">
+                <label class="detail-search-input-label" for="detailSearchInput">说一句或输入搜索条件</label>
+                <input id="detailSearchInput" type="search" placeholder="如：2023年7月一千元以上的支出" autocomplete="off" maxlength="300" />
+                <button id="detailSearchSubmit" class="detail-search-submit" type="submit">搜索</button>
+                <button id="detailVoiceSearchButton" class="detail-search-voice" type="button"><span class="mini-mic" aria-hidden="true"></span><span id="detailVoiceSearchLabel">语音搜索</span></button>
+              </form>
+              <p id="detailVoiceSearchStatus" class="detail-search-hint" role="status">可查时间、金额、科目和备注；未说日期时查所选月份。文字搜索可离线使用，语音识别需要联网。</p>
+              <div id="detailSearchConditions" class="detail-search-conditions" aria-label="已识别的搜索条件" hidden></div>
+              <p id="detailSearchSummary" class="detail-search-summary" role="status" hidden></p>
+            </section>
+            <p id="detailMonthSummary" class="detail-month-summary"></p>
+            <div id="testRecordList" class="record-list"></div>
+          </div>
+          <aside class="month-category-panel">
+            <span id="categoryMonthLabel" class="section-kicker">所选月份</span>
+            <h2 id="categorySummaryTitle">支出科目</h2>
+            <div id="categorySummary" class="category-summary"></div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="chartsView" class="dashboard-view" aria-labelledby="chartsTitle" hidden>
+        <div class="panel-heading report-heading">
+          <div><span class="section-kicker">统计报表</span><h2 id="chartsTitle">收支趋势与分类</h2></div>
+          <label class="report-type-select"><select id="chartTypeSelect" aria-label="统计类型"><option value="expense">支出</option><option value="income">收入</option></select><strong id="chartTypeLabel">支出</strong></label>
+        </div>
+        <div class="report-range-tabs" role="tablist" aria-label="统计周期">
+          <button class="report-range-tab active" type="button" data-range="week">周</button>
+          <button class="report-range-tab" type="button" data-range="month">月</button>
+          <button class="report-range-tab" type="button" data-range="year">年</button>
+        </div>
+        <nav id="periodTabs" class="report-period-tabs" aria-label="周期切换"></nav>
+        <p id="reportPeriodLabel" class="report-period-label"></p>
+        <div class="report-grid">
+          <section class="trend-report">
+            <div class="report-title"><span><strong id="chartTotal">总支出：0.00</strong><small id="chartAverage">平均值：0.00</small></span></div>
+            <div id="trendChart" class="trend-chart"></div>
+          </section>
+          <section class="category-report">
+            <div class="report-title"><strong id="rankingTitle">支出排行榜</strong></div>
+            <div id="categoryRanking" class="category-ranking"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="voiceView" class="dashboard-view active entry-workspace">
+        <div class="entry-mode-tabs" role="tablist" aria-label="记账方式">
+          <button class="entry-mode-tab active" type="button" data-entry-mode="manualEntryMode">手动记账</button>
+          <button class="entry-mode-tab" type="button" data-entry-mode="voiceEntryMode"><span class="mini-mic" aria-hidden="true"></span>语音记账</button>
+          <button class="entry-mode-tab" type="button" data-entry-mode="imageEntryMode">图片识别记账</button>
+        </div>
+
+        <section id="manualEntryMode" class="entry-mode active" aria-label="手动记账">
+          <header class="manual-entry-topbar">
+            <div class="manual-type-tabs" role="tablist" aria-label="收支类型">
+              <button class="manual-type-tab active" type="button" data-manual-type="expense">支出</button>
+              <button class="manual-type-tab" type="button" data-manual-type="income">收入</button>
+            </div>
+            <button id="resetManualEntryBtn" class="text-action" type="button">清空</button>
+          </header>
+          <div id="manualCategoryGrid" class="manual-category-grid"></div>
+          <section class="manual-amount-panel">
+            <output id="manualAmountDisplay" class="manual-amount-display">0.00</output>
+            <div class="manual-fields">
+              <label><span>日期</span><input id="manualDateInput" type="date" /></label>
+              <label><span>备注</span><input id="manualNoteInput" type="text" placeholder="点击填写备注" /></label>
+            </div>
+            <div class="manual-keypad" aria-label="数字键盘">
+              <button type="button" data-manual-key="7">7</button><button type="button" data-manual-key="8">8</button><button type="button" data-manual-key="9">9</button><button class="date-display-key" type="button" data-manual-key="date">今天</button>
+              <button type="button" data-manual-key="4">4</button><button type="button" data-manual-key="5">5</button><button type="button" data-manual-key="6">6</button><button type="button" data-manual-key="+">+</button>
+              <button type="button" data-manual-key="1">1</button><button type="button" data-manual-key="2">2</button><button type="button" data-manual-key="3">3</button><button type="button" data-manual-key="-">−</button>
+              <button type="button" data-manual-key=".">.</button><button type="button" data-manual-key="0">0</button><button type="button" data-manual-key="back" aria-label="退格">⌫</button><button class="manual-done-key" type="button" data-manual-key="done">完成</button>
+            </div>
+            <div class="manual-entry-actions">
+              <button id="deleteManualEntryBtn" class="secondary-action danger-action" type="button" hidden>删除这笔</button>
+              <button id="saveManualEntryBtn" class="primary-action" type="button">保存本笔</button>
+            </div>
+          </section>
+        </section>
+
+        <div id="voiceEntryMode" class="entry-mode" hidden>
+        <section class="voice-stage" aria-labelledby="voiceTitle">
+          <div class="stage-copy">
+            <span class="section-kicker">一句话完成一笔账</span>
+            <h2 id="voiceTitle">说出来，剩下的交给我。</h2>
+            <p>例如：“今天餐饮支出三十五块五，午饭。”</p>
+          </div>
+
+          <button id="voiceButton" class="voice-button" type="button" aria-label="开始语音记账">
+            <span class="mic-icon" aria-hidden="true"></span>
+            <strong id="voiceButtonText">开始说话</strong>
+          </button>
+
+          <div class="listening-bars" id="listeningBars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+          <p class="voice-status" id="voiceStatus" role="status">点击开始录制；中间可以停顿并继续补充金额。</p>
+          <output class="live-transcript" id="liveTranscript">等待你的第一句话</output>
+
+          <div class="examples" aria-label="语音示例">
+            <button type="button" data-demo="今天早上吃早饭花了五块钱">早饭 5</button>
+            <button type="button" data-demo="今天坐公交花了一块六">公交 1.6</button>
+            <button type="button" data-demo="今天工资收入八千元，八月工资">工资 8000</button>
+            <button type="button" data-demo="咸鱼卖自助餐券卖了260块钱，扣掉2块6的服务费和1块5毛6的软件服务费">闲鱼净收入</button>
+            <button type="button" data-demo="8月25餐饮花费¥24.6">日期＋金额符号</button>
+            <button type="button" data-demo="今天餐饮花了十八块九，十九块三，二十块一">多笔自动合计</button>
+          </div>
+        </section>
+
+        <section id="previewPanel" class="preview-panel" aria-labelledby="previewTitle" hidden>
+          <div class="panel-heading">
+            <div><span class="section-kicker">识别结果</span><h2 id="previewTitle">确认这笔记录</h2></div>
+            <span id="confidenceBadge" class="confidence-badge">已识别</span>
+          </div>
+          <div class="receipt-preview">
+            <div class="preview-main"><span id="previewType" class="type-chip expense">支出</span><strong id="previewAmount">¥0.00</strong></div>
+            <dl class="preview-fields">
+              <div><dt>科目</dt><dd id="previewCategory">餐饮</dd></div>
+              <div><dt>日期</dt><dd id="previewDate">今天</dd></div>
+              <div id="previewCalculationRow" class="calculation-field" hidden><dt>计算</dt><dd id="previewCalculation">—</dd></div>
+              <div><dt>备注</dt><dd id="previewNote">—</dd></div>
+              <div><dt>原话</dt><dd id="previewTranscript">—</dd></div>
+            </dl>
+          </div>
+          <p id="parseWarning" class="parse-warning" hidden></p>
+          <div class="preview-actions">
+            <button id="retryButton" class="secondary-action" type="button">重新说</button>
+            <button id="editVoiceDraftButton" class="secondary-action" type="button">手动调整</button>
+            <button id="saveVoiceButton" class="primary-action" type="button">确认保存</button>
+          </div>
+        </section>
+        </div>
+
+        <section id="imageEntryMode" class="entry-mode image-entry-mode" aria-label="图片识别记账" hidden>
+          <div class="image-intro"><span class="section-kicker">支付宝 / 微信截图</span><h2>选截图，核对后一起入账</h2><p>可一次选多张账单截图。已全额退款的付款和返款会一起剔除，部分退款会合并为净支出。截图只在手机本地识别；只有你确认导入的记录才进账本，图片不会上传到外部识别服务。</p></div>
+          <label class="image-upload" for="billImageInput"><span class="image-upload-icon" aria-hidden="true">▧</span><strong>选择账单截图</strong><small>支持 PNG、JPG、WEBP；可多选。含原付款和退款的截图请一起选择，导入前逐笔核对。</small><input id="billImageInput" type="file" accept="image/png,image/jpeg,image/webp,image/*" multiple></label>
+          <p id="imageRecognitionStatus" class="image-recognition-status" role="status">选择截图后，识别结果会显示在这里。</p>
+          <button id="imageCancelButton" class="secondary-action" type="button" hidden>取消识别</button>
+          <details id="imageRecognitionText" class="image-recognition-text" hidden><summary>查看识别文字</summary><pre id="imageRecognitionRawText"></pre></details>
+          <div id="imageRecognitionPreview" class="image-recognition-preview" hidden>
+            <div class="image-preview-heading"><div><span class="section-kicker">导入前核对</span><h3 id="imagePreviewTitle">识别结果</h3></div><span id="imagePreviewSummary"></span></div>
+            <p class="image-review-hint">请重点核对金额、收支方向和日期。已经在账本里的相同记录会默认不选中。</p>
+            <div id="imageDraftList" class="image-draft-list"></div>
+            <div class="image-import-actions"><button id="imageClearButton" class="secondary-action" type="button">清空本次识别</button><button id="imageImportButton" class="primary-action" type="button">一键导入选中记录</button></div>
+          </div>
+        </section>
+      </section>
+
+      <section id="settingsView" class="dashboard-view settings-view" hidden>
+        <header class="settings-header">
+          <span class="section-kicker">本机数据与电脑连接</span>
+          <h2>我的</h2>
+          <p>离线时先保存在手机，回到电脑可连接的网络后再同步。</p>
+        </header>
+
+        <section class="desktop-receiver" aria-labelledby="desktopReceiverTitle">
+          <div class="desktop-receiver-heading">
+            <div>
+              <span class="section-kicker">电脑端专用</span>
+              <h3 id="desktopReceiverTitle">复制同步地址到手机</h3>
+            </div>
+            <button id="desktopReceiverRefreshBtn" class="desktop-refresh-button" type="button">刷新地址</button>
+          </div>
+          <div class="desktop-address-line">
+            <span>当前 Wi‑Fi</span>
+            <code id="desktopReceiverIp">正在读取...</code>
+            <button class="desktop-copy-button" type="button" data-copy-desktop="desktopReceiverIp" aria-label="复制当前 Wi-Fi 同步地址">复制</button>
+          </div>
+          <div class="desktop-address-line">
+            <span>固定备用</span>
+            <code id="desktopReceiverHost">正在读取...</code>
+            <button class="desktop-copy-button" type="button" data-copy-desktop="desktopReceiverHost" aria-label="复制固定同步地址">复制</button>
+          </div>
+          <p id="desktopReceiverStatus" class="desktop-receiver-status">正在连接电脑同步接收器...</p>
+        </section>
+
+        <div class="settings-stack">
+          <section class="settings-row sync-highlight">
+            <div><strong>电脑同步</strong><span id="syncStatus">尚未同步</span></div>
+            <button id="syncNowBtn" class="settings-primary" type="button">立即同步</button>
+          </section>
+
+          <a class="settings-command settings-link" href="/home.html"><strong>返回洒一的财务与投资</strong><span>回到财务与投资主页面</span></a>
+          <a class="settings-command settings-link" href="/财务管理/index.html"><strong>进入财务管理</strong><span>查看本月收支、资产账户和负债</span></a>
+          <a class="settings-command settings-link" href="/支出与收入流水/index.html"><strong>进入流水分析</strong><span>按周、月、年分析手机记账数据</span></a>
+
+          <section class="settings-row mobile-sync-address-control">
+            <div><strong>当前电脑接收地址</strong><span id="computerReceiveAddress">正在读取…</span></div>
+            <button id="copyReceiveAddressBtn" class="settings-small" type="button">复制</button>
+          </section>
+
+          <section class="settings-row">
+            <div><strong>离线可用</strong><span id="offlineStatus">正在检查…</span></div>
+            <button id="offlineCheckBtn" class="settings-small" type="button">检查</button>
+          </section>
+
+          <label class="sync-field mobile-sync-address-control">
+            <span>电脑同步接收地址</span>
+            <div class="sync-address-editor">
+              <input id="syncUrlInput" type="url" inputmode="url" autocomplete="url" autocapitalize="off" spellcheck="false" placeholder="粘贴电脑显示的同步接收地址" />
+              <button id="applySyncUrlBtn" class="settings-primary" type="button">应用地址</button>
+            </div>
+            <button id="resetSyncUrlBtn" class="sync-address-reset" type="button">恢复使用当前网页地址</button>
+            <small id="syncAddressHint">电脑地址变化时，粘贴新地址后点“应用地址”。立即同步和自动同步都会使用它。</small>
+          </label>
+
+          <button id="syncTestBtn" class="settings-command" type="button"><strong>测试电脑连接</strong><span>确认手机能否找到同步接收器</span></button>
+          <button id="exportJsonBtn" class="settings-command" type="button"><strong>导出本月 JSON</strong><span>完整备份，可用于恢复或分析</span></button>
+          <button id="exportCsvBtn" class="settings-command" type="button"><strong>导出本月 CSV</strong><span>可用 Excel、Numbers 打开</span></button>
+          <label class="settings-command settings-file"><strong>从 JSON 恢复</strong><span>导入旧手机或备份中的记账数据</span><input id="importFile" type="file" accept=".json,application/json" /></label>
+          <button id="installGuideBtn" class="settings-command" type="button"><strong>添加到苹果手机桌面</strong><span>安装成独立的手机记账应用</span></button>
+          <button id="syncGuideBtn" class="settings-command" type="button"><strong>离线和自动同步说明</strong><span>查看离线记账与回家补同步方式</span></button>
+          <button id="clearLocalBtn" class="settings-command danger-command" type="button"><strong>清空这台手机的本地数据</strong><span>不会自动删除电脑备份，操作前会再次确认</span></button>
+        </div>
+
+        <p class="settings-note">本页与原手机记账共用同一账本。同步后会继续进入财务管理和支出与收入流水分析。</p>
+      </section>
+
+      <footer>
+        <strong>隐私提示</strong>
+        <span>离线时可继续记账；语音识别需要联网。记录与原手机记账共用，并同步到财务管理。</span>
+      </footer>
+    </main>
+
+    <dialog id="detailMonthCalendar" class="detail-month-calendar" aria-labelledby="detailCalendarTitle">
+      <div class="calendar-heading">
+        <h2 id="detailCalendarTitle">选择明细月份</h2>
+        <button id="detailCalendarClose" class="calendar-close" type="button" aria-label="关闭月份日历">×</button>
+      </div>
+      <label class="calendar-year-label" for="detailCalendarYear">年份</label>
+      <select id="detailCalendarYear" class="calendar-year-select" aria-label="选择明细年份"></select>
+      <div id="detailCalendarMonths" class="calendar-month-grid" aria-label="选择月份"></div>
+      <button id="detailCalendarToday" class="calendar-today" type="button">返回本月</button>
+    </dialog>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <section id="modal" class="modal" hidden>
+      <div class="modal-card">
+        <h2 id="modalTitle">提示</h2>
+        <p id="modalBody"></p>
+        <button id="modalCloseBtn" class="settings-primary" type="button">知道了</button>
+      </div>
+    </section>
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          const key = "sayi-detail-search-controller-20261001";
+          try {
+            if (sessionStorage.getItem(key)) return;
+            sessionStorage.setItem(key, "1");
+          } catch (_) {}
+          location.reload();
+        });
+      }
+    </script>
+    <script src="./ledger-search.js?v=recognition-fix-20261002"></script>
+    <script src="./app.js?v=recognition-fix-20261002"></script>
+    <script src="./image-ledger-parser.js?v=recognition-fix-20261002"></script>
+    <script src="./image-ledger.js?v=recognition-fix-20261002"></script>
+  </body>
+</html>

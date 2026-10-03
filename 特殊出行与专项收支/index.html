@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#34255f">
+  <title>特殊出行与专项收支 - 洒一的财务与投资</title>
+  <link rel="stylesheet" href="../music-player.css?v=20260824b">
+  <link rel="stylesheet" href="./styles.css?v=20260906a">
+  <script defer src="../music-player.js?v=20260824b" data-page="special-ledger"></script>
+  <script defer src="./app.js?v=20260906a"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="back-link" href="../index.html">返回财务与投资</a>
+    <div class="topbar-title"><span class="brand-mark">SAYI</span><strong>特殊出行与专项收支</strong></div>
+    <button id="exportBtn" class="quiet-button" type="button">导出专项数据</button>
+  </header>
+  <main class="app-shell">
+    <aside class="project-rail" aria-label="专项事件">
+      <div class="rail-heading"><div><span class="section-kicker">专项事件</span><h1>一本事，一本账</h1></div><button id="newProjectBtn" class="round-button" type="button" aria-label="新增专项事件">＋</button></div>
+      <p class="rail-intro">旅行、开户、买币和一次性投资工具，在这里单独核算。</p>
+      <div id="projectList" class="project-list"></div>
+      <div class="rail-note"><img src="../品牌资产/角色动图/桃绘/taohui-receipt.gif?v=20260822-gemini" alt="桃绘整理专项账单"><p>收入可包含现金、券、赠股和返利。估值项目会单独标记。</p></div>
+    </aside>
+    <section class="workspace">
+      <header class="workspace-header">
+        <div><div class="project-meta"><span id="projectKind">旅行</span><span id="projectDates">—</span></div><h2 id="projectTitle">港澳旅行</h2><p id="projectSubtitle">正在读取专项数据。</p></div>
+        <div class="header-actions"><button id="syncTravelBtn" class="secondary-button" type="button">刷新旅行支出</button><button id="newEntryBtn" class="primary-button" type="button">新增收支</button></div>
+      </header>
+      <section class="metrics" aria-label="专项摘要">
+        <div class="metric expense"><span>总支出</span><strong id="expenseTotal">¥0.00</strong><small id="expenseCount">0 笔</small></div>
+        <div class="metric income"><span>总收入</span><strong id="incomeTotal">¥0.00</strong><small id="incomeCount">0 笔</small></div>
+        <div class="metric net"><span>净成本</span><strong id="netTotal">¥0.00</strong><small>支出减收入</small></div>
+        <div class="metric cover"><span>收入覆盖率</span><strong id="coverageRate">0%</strong><small>按人民币折算</small></div>
+      </section>
+      <section class="visual-section">
+        <div class="balance-visual">
+          <div class="section-title-row"><div><span class="section-kicker">收支对照</span><h3>这件事最终花了多少</h3></div><span id="valuationBadge" class="status-badge">含估值收入</span></div>
+          <div class="balance-bars"><div class="balance-row"><span>支出</span><div class="bar-track"><i id="expenseBar"></i></div><strong id="expenseBarValue">¥0</strong></div><div class="balance-row"><span>收入</span><div class="bar-track"><i id="incomeBar"></i></div><strong id="incomeBarValue">¥0</strong></div></div>
+          <p id="balanceInsight" class="insight-line"></p>
+        </div>
+        <div class="category-visual"><div class="section-title-row"><div><span class="section-kicker">支出构成</span><h3>钱主要花在哪里</h3></div></div><div id="categoryBars" class="category-bars"></div></div>
+      </section>
+      <section class="ledger-section">
+        <div class="ledger-toolbar"><div><span class="section-kicker">明细</span><h3>专项收支记录</h3></div><div class="filters" role="group" aria-label="收支筛选"><button class="filter-button active" type="button" data-filter="all">全部</button><button class="filter-button" type="button" data-filter="expense">支出</button><button class="filter-button" type="button" data-filter="income">收入</button></div></div>
+        <div class="table-wrap"><table><thead><tr><th>日期</th><th>收支</th><th>项目</th><th>分类</th><th>原币</th><th>折合人民币</th><th>依据</th><th></th></tr></thead><tbody id="entryTableBody"></tbody></table></div>
+        <div id="emptyState" class="empty-state" hidden>这个筛选下还没有记录。</div>
+      </section>
+    </section>
+  </main>
+  <dialog id="entryDialog" class="editor-dialog"><form id="entryForm" method="dialog">
+    <div class="dialog-heading"><div><span class="section-kicker">专项明细</span><h3 id="entryDialogTitle">新增收支</h3></div><button class="dialog-close" value="cancel" aria-label="关闭">×</button></div>
+    <input id="entryId" type="hidden"><div class="form-grid">
+      <label>收支<select id="entryDirection"><option value="expense">支出</option><option value="income">收入</option></select></label><label>日期<input id="entryDate" type="date" required></label>
+      <label class="wide">项目<input id="entryDescription" type="text" placeholder="例如：交通卡、开户返现" required></label><label>分类<input id="entryCategory" type="text" list="categoryOptions" required></label><label>细分类<input id="entrySubcategory" type="text" placeholder="可选"></label>
+      <label>金额<input id="entryAmount" type="number" min="0" step="0.01" required></label><label>币种<select id="entryCurrency"><option>CNY</option><option>HKD</option><option>USD</option><option>USDT</option><option>BTC</option><option>其他</option></select></label><label>折人民币汇率<input id="entryRate" type="number" min="0" step="0.000001" value="1" required></label>
+      <label class="checkbox-label"><input id="entryEstimated" type="checkbox">这是估值，不是已到账现金</label><label class="wide">依据/备注<textarea id="entrySourceNote" rows="3" placeholder="券面值、成交价、平台记录或其他说明"></textarea></label>
+    </div><div class="dialog-actions"><button class="secondary-button" value="cancel" type="button" data-close-dialog>取消</button><button class="primary-button" value="default" type="submit">保存记录</button></div>
+  </form></dialog>
+  <dialog id="projectDialog" class="editor-dialog small"><form id="projectForm" method="dialog">
+    <div class="dialog-heading"><div><span class="section-kicker">新专项</span><h3>建立一本新账</h3></div><button class="dialog-close" value="cancel" aria-label="关闭">×</button></div><div class="form-grid">
+      <label class="wide">专项名称<input id="projectName" type="text" placeholder="例如：日本旅行、买币计划" required></label><label>类型<select id="projectType"><option value="travel">旅行</option><option value="investment">投资工具</option><option value="crypto">买币/换汇</option><option value="reward">开户/奖励</option><option value="other">其他专项</option></select></label><label>状态<select id="projectStatus"><option value="active">进行中</option><option value="planned">计划中</option><option value="closed">已结束</option></select></label><label>开始日期<input id="projectStart" type="date" required></label><label>结束日期<input id="projectEnd" type="date" required></label>
+    </div><div class="dialog-actions"><button class="secondary-button" value="cancel" type="button" data-close-dialog>取消</button><button class="primary-button" value="default" type="submit">创建专项</button></div>
+  </form></dialog>
+  <datalist id="categoryOptions"><option value="吃"><option value="住"><option value="出行"><option value="购物"><option value="通讯"><option value="签注/手续"><option value="现金券"><option value="返现"><option value="股票奖励"><option value="买币"><option value="投资工具"><option value="其他"></datalist>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

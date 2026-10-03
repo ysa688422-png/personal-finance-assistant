@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#ff6b9d">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>洒一投资工具箱 - 二次元投资作战室</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="../品牌资产/sayi-finance-app-icon.png">
+    <link rel="stylesheet" href="../music-player.css?v=20260824b">
+    <script defer src="../music-player.js?v=20260824b" data-page="toolbox"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #ff6b9d;
+            --secondary: #c44569;
+            --accent: #f8b500;
+            --dark: #1a1a2e;
+            --darker: #16213e;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --chainsaw-red: #ff2d55;
+            --mygo-cyan: #00d9ff;
+            --mygo-pink: #ff6b9d;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* 二次元背景装饰 */
+        .anime-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.08;
+        }
+        
+        .anime-bg::before {
+            content: 'SAYI MONEY';
+            position: absolute;
+            top: 5%;
+            right: 2%;
+            font-size: 100px;
+            color: var(--chainsaw-red);
+            font-weight: bold;
+            transform: rotate(-15deg);
+            text-shadow: 0 0 30px rgba(255, 45, 85, 0.5);
+        }
+        
+        .anime-bg::after {
+            content: 'KAWAII INVEST';
+            position: absolute;
+            bottom: 10%;
+            left: 2%;
+            font-size: 80px;
+            color: var(--mygo-cyan);
+            font-weight: bold;
+            transform: rotate(10deg);
+            text-shadow: 0 0 30px rgba(0, 217, 255, 0.5);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .back-home-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            margin-bottom: 16px;
+            padding: 9px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-home-link:hover {
+            background: rgba(255, 107, 157, 0.28);
+            box-shadow: 0 6px 18px rgba(255, 107, 157, 0.24);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header h1 {
+            color: #fff;
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(255, 107, 157, 0.8);
+            background: linear-gradient(45deg, #ff6b9d, #00d9ff, #ff2d55);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            color: #888;
+            font-size: 1.2em;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .tool-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 40px rgba(255, 107, 157, 0.3);
+        }
+        
+        .tool-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+        
+        .tool-card h2 {
+            color: var(--primary);
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+        
+        .tool-card p {
+            color: #666;
+            font-size: 1em;
+            line-height: 1.6;
+        }
+        
+        .tool-card .btn-enter {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #ff6b9d, #c44569);
+            color: white;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .tool-card:hover .btn-enter {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255, 107, 157, 0.4);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #888;
+            font-size: 0.9em;
+        }
+        
+        /* 波奇塔装饰 */
+        .pochita {
+            position: fixed;
+            bottom: 5%;
+            right: 5%;
+            width: 120px;
+            height: 100px;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.9;
+            animation: pochitaBounce 2s ease-in-out infinite;
+        }
+        
+        .pochita-body {
+            width: 80px;
+            height: 60px;
+            background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+            border-radius: 50% 50% 45% 45%;
+            position: relative;
+            box-shadow: 0 5px 20px rgba(255, 107, 53, 0.4);
+        }
+        
+        .pochita-body::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 25px;
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .pochita-body::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 8px;
+            background: #ff4444;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(255, 68, 68, 0.6);
+        }
+        
+        .pochita-eyes {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .pochita-eye {
+            width: 12px;
+            height: 12px;
+            background: #000;
+            border-radius: 50%;
+            position: relative;
+        }
+        
+        .pochita-eye::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 3px;
+            width: 4px;
+            height: 4px;
+            background: #fff;
+            border-radius: 50%;
+        }
+        
+        .pochita-handle {
+            position: absolute;
+            top: 50%;
+            right: -20px;
+            width: 25px;
+            height: 8px;
+            background: linear-gradient(90deg, #666 0%, #999 50%, #666 100%);
+            border-radius: 4px;
+            transform: translateY(-50%) rotate(-30deg);
+        }
+        
+        .pochita-tail {
+            position: absolute;
+            bottom: 10px;
+            left: -15px;
+            width: 30px;
+            height: 8px;
+            background: #ff6b35;
+            border-radius: 4px;
+            transform: rotate(-20deg);
+            animation: tailWag 1s ease-in-out infinite;
+        }
+        
+        @keyframes pochitaBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes tailWag {
+            0%, 100% { transform: rotate(-20deg); }
+            50% { transform: rotate(-35deg); }
+        }
+        
+        /* 高松灯装饰 */
+        .tomori {
+            position: fixed;
+            bottom: 5%;
+            left: 5%;
+            width: 100px;
+            height: 150px;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.9;
+            animation: tomoriFloat 3s ease-in-out infinite;
+        }
+        
+        .tomori-hair {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 50px;
+            background: linear-gradient(135deg, #888 0%, #aaa 50%, #888 100%);
+            border-radius: 50% 50% 40% 40%;
+        }
+        
+        .tomori-hair::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: -5px;
+            width: 20px;
+            height: 35px;
+            background: linear-gradient(135deg, #888 0%, #aaa 100%);
+            border-radius: 50%;
+            transform: rotate(-20deg);
+        }
+        
+        .tomori-hair::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            right: -5px;
+            width: 20px;
+            height: 35px;
+            background: linear-gradient(135deg, #888 0%, #aaa 100%);
+            border-radius: 50%;
+            transform: rotate(20deg);
+        }
+        
+        .tomori-face {
+            position: absolute;
+            top: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 45px;
+            background: linear-gradient(135deg, #ffe4d6 0%, #ffd4c4 100%);
+            border-radius: 50%;
+        }
+        
+        .tomori-eyes {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 35px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .tomori-eye {
+            width: 8px;
+            height: 10px;
+            background: #ff99cc;
+            border-radius: 50%;
+            position: relative;
+        }
+        
+        .tomori-eye::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 3px;
+            height: 3px;
+            background: #fff;
+            border-radius: 50%;
+        }
+        
+        .tomori-mouth {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 4px;
+            background: #ff9999;
+            border-radius: 0 0 50% 50%;
+        }
+        
+        .tomori-body {
+            position: absolute;
+            top: 75px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 45px;
+            height: 50px;
+            background: linear-gradient(135deg, #77BBDD 0%, #99CCDD 100%);
+            border-radius: 20% 20% 40% 40%;
+        }
+        
+        .tomori-note {
+            position: absolute;
+            top: -20px;
+            right: -30px;
+            font-size: 24px;
+            color: #77BBDD;
+            animation: noteFloat 2s ease-in-out infinite;
+            opacity: 0.8;
+        }
+        
+        @keyframes tomoriFloat {
+            0%, 100% { transform: translateY(0) rotate(-2deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+        }
+        
+        @keyframes noteFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.8; }
+            50% { transform: translateY(-15px) rotate(10deg); opacity: 0.4; }
+        }
+        
+        /* 飞行员黑猫装饰 */
+        .pilot-cat {
+            position: fixed;
+            top: 20%;
+            right: 5%;
+            width: 200px;
+            height: 200px;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.9;
+            animation: floatCat 4s ease-in-out infinite;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .pilot-cat img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        @keyframes floatCat {
+            0%, 100% { transform: translateY(0) rotate(-2deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+        
+        /* 街头风格人物装饰 */
+        .street-style {
+            position: fixed;
+            bottom: 15%;
+            left: 3%;
+            width: 180px;
+            height: 225px;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.85;
+            animation: bounceStyle 3s ease-in-out infinite;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .street-style img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        @keyframes bounceStyle {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.02); }
+        }
+    
+
+/* ===== 手机端/数据安全补丁：自动生成，不影响原有数据 ===== */
+@media (max-width: 768px) {
+  body { padding: 10px; }
+  .main-content, .main-grid, .tools-grid, .charts-grid, .stats-grid, .stats-section, .assets-multi-currency { grid-template-columns: 1fr !important; }
+  .left-column, .right-column, .form-section, .list-section, .card, .table-section, .chart-card, .stat-card { width: 100%; padding: 14px; border-radius: 12px; }
+  .header { padding: 16px 12px; margin-bottom: 16px; }
+  .header h1 { font-size: 1.6rem !important; }
+  .header::before, .header::after, .anime-character, .floating-symbol, .music-note, .chainsaw-icon, .deco-img, .pilot-cat, .street-style, .pochita, .tomori { display: none !important; }
+  .back-link { position: static !important; display: inline-block; transform: none !important; margin-bottom: 10px; }
+  .flex-row, .form-row, .currency-row { flex-direction: column; align-items: stretch; }
+  input, select, button { min-height: 44px; font-size: 16px !important; }
+  .chart-container { height: 240px; }
+  table thead { display: none; }
+  table, tbody, tr, td { display: block; width: 100%; }
+  tr { margin-bottom: 12px; padding: 12px; border-radius: 12px; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+  td { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid #eee; text-align: right; word-break: break-word; }
+  td::before { content: attr(data-label); font-weight: 600; color: #666; text-align: left; flex: 0 0 42%; }
+  td.empty-state { display: block; text-align: center; }
+  td.empty-state::before { content: ''; }
+}
+
+</style>
+    <link rel="stylesheet" href="../sayi-anime-theme.css?v=20260621-cream2">
+</head>
+<body>
+<nav data-public-navigation style="padding:10px 20px;background:#f7f1e9;color:#413831;font:14px sans-serif;position:relative;z-index:10"><a href="./index.html">投资工具箱</a> · <a href="./长桥数据.html">长桥数据</a> · <a href="../index.html">个人财务与投资</a></nav>
+    <div class="anime-bg"></div>
+    
+    <!-- 飞行员黑猫 -->
+    <div class="pilot-cat">
+        <img src="../品牌资产/角色立绘/紫铃.png" alt="飞行员黑猫">
+    </div>
+    
+    <!-- 街头风格人物 -->
+    <div class="street-style">
+        <img src="../品牌资产/角色立绘/紫铃.png" alt="街头风格">
+    </div>
+    
+    <!-- 装饰图片1 - 飞行员黑猫 - 已隐藏 -->
+    <!-- <div class="deco-img deco-img-1">
+        <img src="../品牌资产/角色立绘/紫铃.png" alt="飞行员黑猫">
+    </div> -->
+    
+    <!-- 波奇塔 -->
+    <div class="pochita">
+        <div class="pochita-body">
+            <div class="pochita-eyes">
+                <div class="pochita-eye"></div>
+                <div class="pochita-eye"></div>
+            </div>
+            <div class="pochita-handle"></div>
+            <div class="pochita-tail"></div>
+        </div>
+    </div>
+    
+    <!-- 高松灯 -->
+    <div class="tomori">
+        <div class="tomori-hair"></div>
+        <div class="tomori-face">
+            <div class="tomori-eyes">
+                <div class="tomori-eye"></div>
+                <div class="tomori-eye"></div>
+            </div>
+            <div class="tomori-mouth"></div>
+        </div>
+        <div class="tomori-body"></div>
+        <div class="tomori-note">♪</div>
+    </div>
+    
+    <div class="container">
+        <a class="back-home-link" href="/home.html?v=20260621-cream2">← 返回洒一的财务与投资</a>
+        <div class="header">
+            <h1>洒一投资工具箱</h1>
+            <p>二次元投资作战室 · 持仓、打新、奖励和复盘都在这里</p>
+        </div>
+        
+        <div class="tools-grid">
+            <div class="tool-card" onclick="window.location.href='股票持仓.html'">
+                <div class="tool-icon">📈</div>
+                <h2>股票持仓管理</h2>
+                <p>管理您的股票投资组合，支持多币种、实时汇率、持仓分布分析、总资产趋势追踪</p>
+                <span class="btn-enter">进入工具 →</span>
+            </div>
+            
+            <div class="tool-card" onclick="window.location.href='洒一开户奖励.html'">
+                <div class="tool-icon">🎁</div>
+                <h2>开户奖励记录</h2>
+                <p>记录各券商开户奖励，支持交易费返还、现金券、股票奖励、财哥奖励多币种管理</p>
+                <span class="btn-enter">进入工具 →</span>
+            </div>
+            
+            <div class="tool-card" onclick="window.location.href='洒一港股打新.html'">
+                <div class="tool-icon">🎯</div>
+                <h2>港股打新记录</h2>
+                <p>记录港股打新申购、中签情况，统计盈亏金额，支持多券商管理</p>
+                <span class="btn-enter">进入工具 →</span>
+            </div>
+
+            <div class="tool-card" onclick="window.location.href='日内期权交易记录.html'">
+                <div class="tool-icon">⚡</div>
+                <h2>日内期权交易记录</h2>
+                <p>记录每天日内期权交易、盈亏复盘、心得结论，以及 QQQ 当日走势观察</p>
+                <span class="btn-enter">进入工具 →</span>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2026 洒一投资工具箱 | 数据存储在本地浏览器 | 可在任何电脑上使用</p>
+            <p style="margin-top: 10px;">
+                <button onclick="exportAllData()" style="background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; margin-right: 10px;">📤 导出所有数据</button>
+                <button onclick="document.getElementById('importFile').click()" style="background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; margin-right: 10px;">📥 导入数据</button>
+                <button onclick="restoreLatestBackup()" style="background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; margin-right: 10px;">↩️ 恢复最近本地备份</button>
+                <button onclick="enableFileBackup()" style="background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer;">💾 开启自动备份</button>
+                <input type="file" id="importFile" style="display: none;" accept=".json" onchange="importAllData(this)">
+            </p>
+            <p id="pwaStatus" style="margin-top: 10px; font-size: 0.8em; color: #aaa;"></p>
+            <p id="fileBackupStatus" style="margin-top: 8px; font-size: 0.8em; color: #aaa;"></p>
+        </div>
+    </div>
+    
+    <script src="../site-auto-backup.js"></script>
+    <script src="./auto-backup.js"></script>
+    <!-- PWA 功能脚本 - 修复版 -->
+    <script>
+        // 注册 Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('SW registered:', registration);
+                        document.getElementById('pwaStatus').textContent = '✓ 已启用离线模式';
+                    })
+                    .catch(error => {
+                        console.log('SW registration failed:', error);
+                        document.getElementById('pwaStatus').textContent = '✗ 离线模式未启用';
+                    });
+            });
+        }
+        
+
+        // 数据存储键名：保留旧 key，避免现有数据丢失
+        const STORAGE_KEYS = {
+            stockPortfolio: 'stockPortfolio_v3_anime',
+            accountRewards: 'accountRewards_v4',
+            hkIpoRecords: 'hkIpoRecords_v2',
+            intradayOptions: 'intradayOptionsRecords_v1',
+            intradayOptionImages: 'intradayOptionsTradeImages_v1'
+        };
+        const AUTO_BACKUP_KEY = 'sayi_auto_backups_v1';
+        const OPTION_IMAGE_DB_NAME = 'sayi_intraday_option_images_db';
+        const OPTION_IMAGE_STORE_NAME = 'images';
+
+        function safeParse(raw, fallback = null) {
+            if (!raw || raw === 'null' || raw === 'undefined') return fallback;
+            try { return typeof raw === 'string' ? JSON.parse(raw) : raw; }
+            catch (e) { console.error('JSON 解析失败:', e); return fallback; }
+        }
+
+        function getModuleObject(key, fallback) {
+            return safeParse(localStorage.getItem(key), fallback);
+        }
+
+        function countActive(list) {
+            return (Array.isArray(list) ? list : []).filter(item => !item.deleted).length;
+        }
+
+        function countOptionImages(imageData) {
+            const imageMap = imageData?.images || imageData || {};
+            return Object.values(imageMap).reduce((sum, day) => {
+                if (Array.isArray(day)) return sum + day.filter(item => item && (item.imageDataUrl || item.imageKey)).length;
+                if (Array.isArray(day?.items)) return sum + day.items.filter(item => item && (item.imageDataUrl || item.imageKey)).length;
+                return sum + (day && (day.imageDataUrl || day.imageKey) ? 1 : 0);
+            }, 0);
+        }
+
+        function openOptionImageDb() {
+            return new Promise((resolve, reject) => {
+                if (!('indexedDB' in window)) {
+                    reject(new Error('当前浏览器不支持图片数据库'));
+                    return;
+                }
+                const request = indexedDB.open(OPTION_IMAGE_DB_NAME, 1);
+                request.onupgradeneeded = () => request.result.createObjectStore(OPTION_IMAGE_STORE_NAME);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function optionImageDbGet(key) {
+            if (!key) return '';
+            const db = await openOptionImageDb();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(OPTION_IMAGE_STORE_NAME, 'readonly');
+                const req = tx.objectStore(OPTION_IMAGE_STORE_NAME).get(key);
+                req.onsuccess = () => resolve(req.result || '');
+                req.onerror = () => reject(req.error);
+                tx.oncomplete = () => db.close();
+            });
+        }
+
+        async function optionImageDbSet(key, value) {
+            const db = await openOptionImageDb();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(OPTION_IMAGE_STORE_NAME, 'readwrite');
+                tx.objectStore(OPTION_IMAGE_STORE_NAME).put(value, key);
+                tx.oncomplete = () => { db.close(); resolve(); };
+                tx.onerror = () => { db.close(); reject(tx.error); };
+            });
+        }
+
+        async function hydrateOptionImagesForExport(imageData) {
+            const clone = JSON.parse(JSON.stringify(imageData || {}));
+            const imageMap = clone.images || clone || {};
+            const tasks = [];
+            Object.values(imageMap).forEach(day => {
+                const items = Array.isArray(day) ? day : (Array.isArray(day?.items) ? day.items : (day ? [day] : []));
+                items.forEach(item => {
+                    if (!item || item.imageDataUrl || !item.imageKey) return;
+                    tasks.push(optionImageDbGet(item.imageKey).then(dataUrl => {
+                        if (dataUrl) item.imageDataUrl = dataUrl;
+                    }).catch(() => {}));
+                });
+            });
+            await Promise.all(tasks);
+            return clone;
+        }
+
+        function stripOptionImageDataForStorage(imageData) {
+            const clone = JSON.parse(JSON.stringify(imageData || {}));
+            const imageMap = clone.images || clone || {};
+            Object.values(imageMap).forEach(day => {
+                const items = Array.isArray(day) ? day : (Array.isArray(day?.items) ? day.items : (day ? [day] : []));
+                items.forEach(item => {
+                    if (!item) return;
+                    item.imageKey = item.imageKey || item.id;
+                    delete item.imageDataUrl;
+                });
+            });
+            return clone;
+        }
+
+        async function storeOptionImagesFromImport(imageData) {
+            const clone = JSON.parse(JSON.stringify(imageData || {}));
+            const imageMap = clone.images || clone || {};
+            const tasks = [];
+            Object.values(imageMap).forEach(day => {
+                const items = Array.isArray(day) ? day : (Array.isArray(day?.items) ? day.items : (day ? [day] : []));
+                items.forEach(item => {
+                    if (!item || !item.imageDataUrl) return;
+                    item.imageKey = item.imageKey || item.id || ('image_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8));
+                    if (!item.id) item.id = item.imageKey;
+                    tasks.push(optionImageDbSet(item.imageKey, item.imageDataUrl));
+                });
+            });
+            await Promise.all(tasks);
+            return stripOptionImageDataForStorage(clone);
+        }
+
+        function getAllData() {
+            const stockPortfolio = getModuleObject(STORAGE_KEYS.stockPortfolio, {});
+            const accountRewards = getModuleObject(STORAGE_KEYS.accountRewards, {});
+            const hkIpoRecords = getModuleObject(STORAGE_KEYS.hkIpoRecords, {});
+            const intradayOptions = getModuleObject(STORAGE_KEYS.intradayOptions, {});
+            const intradayOptionImages = getModuleObject(STORAGE_KEYS.intradayOptionImages, {});
+            return { stockPortfolio, accountRewards, hkIpoRecords, intradayOptions, intradayOptionImages };
+        }
+
+        function getRawAllData() {
+            return {
+                [STORAGE_KEYS.stockPortfolio]: localStorage.getItem(STORAGE_KEYS.stockPortfolio),
+                [STORAGE_KEYS.accountRewards]: localStorage.getItem(STORAGE_KEYS.accountRewards),
+                [STORAGE_KEYS.hkIpoRecords]: localStorage.getItem(STORAGE_KEYS.hkIpoRecords),
+                [STORAGE_KEYS.intradayOptions]: localStorage.getItem(STORAGE_KEYS.intradayOptions),
+                [STORAGE_KEYS.intradayOptionImages]: localStorage.getItem(STORAGE_KEYS.intradayOptionImages)
+            };
+        }
+
+        function createLocalBackup(reason = 'manual') {
+            const backup = {
+                id: 'backup_' + Date.now(),
+                reason,
+                time: new Date().toISOString(),
+                data: getRawAllData()
+            };
+            const backups = safeParse(localStorage.getItem(AUTO_BACKUP_KEY), []);
+            backups.unshift(backup);
+            localStorage.setItem(AUTO_BACKUP_KEY, JSON.stringify(backups.slice(0, 20)));
+            if (window.sayiAutoFileBackup) window.sayiAutoFileBackup.schedule(reason);
+            return backup;
+        }
+
+        function restoreLatestBackup() {
+            const backups = safeParse(localStorage.getItem(AUTO_BACKUP_KEY), []);
+            if (!backups.length) {
+                alert('目前没有找到本地自动备份。');
+                return;
+            }
+            const latest = backups[0];
+            const ok = confirm('将恢复最近一次本地自动备份。\n\n备份时间：' + new Date(latest.time).toLocaleString() + '\n原因：' + latest.reason + '\n\n当前数据会被覆盖，但覆盖前也会再自动备份一次。继续吗？');
+            if (!ok) return;
+            createLocalBackup('before_restore_latest_backup');
+            Object.entries(latest.data || {}).forEach(([key, value]) => {
+                if (value !== null && value !== undefined) localStorage.setItem(key, value);
+            });
+            alert('✓ 已恢复最近一次本地备份，页面将刷新。');
+            location.reload();
+        }
+
+        function dailyAutoBackup() {
+            const today = new Date().toISOString().slice(0, 10);
+            const last = localStorage.getItem('sayi_last_auto_backup_date');
+            if (last === today) return;
+            createLocalBackup('daily_auto_backup');
+            localStorage.setItem('sayi_last_auto_backup_date', today);
+            if (window.sayiAutoFileBackup) window.sayiAutoFileBackup.saveNow('daily_auto_backup').then(() => window.sayiAutoFileBackup.refreshStatus()).catch(error => console.warn('自动文件备份失败:', error));
+        }
+        dailyAutoBackup();
+
+        async function enableFileBackup() {
+            if (!window.sayiAutoFileBackup) return;
+            await window.sayiAutoFileBackup.chooseBackupFolder();
+            window.sayiAutoFileBackup.refreshStatus();
+        }
+
+        window.addEventListener('load', () => {
+            if (window.sayiAutoFileBackup) window.sayiAutoFileBackup.refreshStatus();
+        });
+
+        async function exportAllData() {
+            const data = getAllData();
+            data.intradayOptionImages = await hydrateOptionImagesForExport(data.intradayOptionImages);
+            const stockCount = countActive(data.stockPortfolio.stocks || (Array.isArray(data.stockPortfolio) ? data.stockPortfolio : []));
+            const accountCount = countActive(data.accountRewards.accounts || (Array.isArray(data.accountRewards) ? data.accountRewards : []));
+            const ipoCount = countActive(data.hkIpoRecords.records || (Array.isArray(data.hkIpoRecords) ? data.hkIpoRecords : []));
+            const optionCount = countActive(data.intradayOptions.records || (Array.isArray(data.intradayOptions) ? data.intradayOptions : []));
+            const optionImageCount = countOptionImages(data.intradayOptionImages);
+            const totalCount = stockCount + accountCount + ipoCount + optionCount;
+
+            if (totalCount === 0) {
+                alert('⚠️ 暂无数据可导出。');
+                return;
+            }
+
+            const exportData = {
+                app: 'sayi-invest-toolbox',
+                version: '3.0-safe-json',
+                exportTime: new Date().toISOString(),
+                data,
+                rawData: getRawAllData(),
+                stats: { stockCount, accountCount, ipoCount, optionCount, optionImageCount, totalCount }
+            };
+
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `洒一投资数据备份_${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            if (window.sayiAutoFileBackup) window.sayiAutoFileBackup.saveNow('manual_export').then(() => window.sayiAutoFileBackup.refreshStatus()).catch(error => console.warn('自动文件备份失败:', error));
+
+            alert(`✓ 数据已导出！
+
+📈 股票持仓: ${stockCount} 条
+🎁 开户奖励: ${accountCount} 条
+🎯 港股打新: ${ipoCount} 条
+⚡ 日内期权: ${optionCount} 条
+🖼️ 期权截图: ${optionImageCount} 张
+
+总计: ${totalCount} 条
+
+新版备份同时保存对象数据和原始 localStorage 数据，更安全。`);
+        }
+
+        function normalizeImportedModule(data, legacyKey) {
+            if (!data) return null;
+            if (data.rawData && data.rawData[legacyKey]) return safeParse(data.rawData[legacyKey], null);
+            if (data.data) {
+                if (legacyKey === STORAGE_KEYS.stockPortfolio) return data.data.stockPortfolio || null;
+                if (legacyKey === STORAGE_KEYS.accountRewards) return data.data.accountRewards || null;
+                if (legacyKey === STORAGE_KEYS.hkIpoRecords) return data.data.hkIpoRecords || null;
+                if (legacyKey === STORAGE_KEYS.intradayOptions) return data.data.intradayOptions || null;
+                if (legacyKey === STORAGE_KEYS.intradayOptionImages) return data.data.intradayOptionImages || data.data.tradeImages || data.data.images || null;
+            }
+            if (legacyKey === STORAGE_KEYS.stockPortfolio && data.stockPortfolio) return safeParse(data.stockPortfolio, data.stockPortfolio);
+            if (legacyKey === STORAGE_KEYS.accountRewards && data.accountRewards) return safeParse(data.accountRewards, data.accountRewards);
+            if (legacyKey === STORAGE_KEYS.hkIpoRecords && data.hkIpoRecords) return safeParse(data.hkIpoRecords, data.hkIpoRecords);
+            if (legacyKey === STORAGE_KEYS.intradayOptions && data.intradayOptions) return safeParse(data.intradayOptions, data.intradayOptions);
+            if (legacyKey === STORAGE_KEYS.intradayOptionImages && (data.intradayOptionImages || data.tradeImages || data.images)) return safeParse(data.intradayOptionImages || data.tradeImages || data.images, data.intradayOptionImages || data.tradeImages || data.images);
+            return null;
+        }
+
+        function importAllData(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (!imported || typeof imported !== 'object') throw new Error('备份文件不是有效 JSON 对象');
+
+                    createLocalBackup('before_import_' + file.name);
+
+                    let importCount = 0;
+                    let info = '✓ 数据导入成功！导入前已自动保存当前数据。\n\n';
+
+                    const stock = normalizeImportedModule(imported, STORAGE_KEYS.stockPortfolio);
+                    if (stock) {
+                        const normalized = Array.isArray(stock) ? { stocks: stock } : stock;
+                        localStorage.setItem(STORAGE_KEYS.stockPortfolio, JSON.stringify(normalized));
+                        info += `📈 股票持仓: ${countActive(normalized.stocks || [])} 条
+`;
+                        importCount++;
+                    }
+
+                    const account = normalizeImportedModule(imported, STORAGE_KEYS.accountRewards);
+                    if (account) {
+                        const normalized = Array.isArray(account) ? { accounts: account, exchangeRates: { USD: 7.25, HKD: 0.92 } } : {
+                            accounts: account.accounts || [],
+                            exchangeRates: account.exchangeRates || { USD: 7.25, HKD: 0.92 },
+                            timestamp: account.timestamp || new Date().toISOString()
+                        };
+                        localStorage.setItem(STORAGE_KEYS.accountRewards, JSON.stringify(normalized));
+                        info += `🎁 开户奖励: ${countActive(normalized.accounts || [])} 条
+`;
+                        importCount++;
+                    }
+
+                    const ipo = normalizeImportedModule(imported, STORAGE_KEYS.hkIpoRecords);
+                    if (ipo) {
+                        const normalized = Array.isArray(ipo) ? { records: ipo } : ipo;
+                        localStorage.setItem(STORAGE_KEYS.hkIpoRecords, JSON.stringify(normalized));
+                        info += `🎯 港股打新: ${countActive(normalized.records || [])} 条
+`;
+                        importCount++;
+                    }
+
+                    const optionRecords = normalizeImportedModule(imported, STORAGE_KEYS.intradayOptions);
+                    if (optionRecords) {
+                        const normalized = Array.isArray(optionRecords) ? { records: optionRecords } : optionRecords;
+                        localStorage.setItem(STORAGE_KEYS.intradayOptions, JSON.stringify(normalized));
+                        info += `⚡ 日内期权: ${countActive(normalized.records || [])} 条
+`;
+                        importCount++;
+                    }
+
+                    const optionImages = normalizeImportedModule(imported, STORAGE_KEYS.intradayOptionImages);
+                    if (optionImages) {
+                        const normalized = await storeOptionImagesFromImport(optionImages.images ? optionImages : { images: optionImages });
+                        const imageCount = countOptionImages(normalized);
+                        localStorage.setItem(STORAGE_KEYS.intradayOptionImages, JSON.stringify(normalized));
+                        info += `🖼️ 期权截图: ${imageCount} 张
+`;
+                        importCount++;
+                    }
+
+                    if (importCount === 0) {
+                        alert('⚠️ 没有识别到有效的投资工具箱数据。当前数据没有被覆盖。');
+                        return;
+                    }
+                    if (window.sayiAutoFileBackup) window.sayiAutoFileBackup.schedule('after_import');
+                    alert(info + '\n页面将刷新。');
+                    location.reload();
+                } catch (error) {
+                    console.error(error);
+                    alert('✗ 导入失败：' + error.message + '\n\n当前数据没有被覆盖。');
+                } finally {
+                    input.value = '';
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // 添加到主屏幕提示
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('pwaStatus').innerHTML = 
+                '✓ 可以安装到主屏幕 <button onclick="installApp()" style="background: #ff6b9d; color: #fff; border: none; padding: 5px 10px; border-radius: 10px; cursor: pointer; margin-left: 10px;">立即安装</button>';
+        });
+        
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    } else {
+                        console.log('User dismissed the install prompt');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+        
+        // 检查是否已安装
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            document.getElementById('pwaStatus').textContent = '✓ 已作为App安装';
+        }
+    </script>
+</body>
+</html>

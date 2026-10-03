@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>财务管理</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="../sayi-anime-theme.css?v=20260621-cream2" />
+    <link rel="stylesheet" href="../music-player.css?v=20260824b" />
+    <script defer src="../music-player.js?v=20260824b" data-page="finance"></script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">¥</span>
+          <div>
+            <h1>财务管理</h1>
+            <p>收入、账单、负债和支出诊断</p>
+          </div>
+        </div>
+
+        <a class="back-home-link" href="/home.html?v=20260621-cream2">← 返回洒一的财务与投资</a>
+
+        <label class="month-picker">
+          <span>当前月份</span>
+          <input id="monthInput" type="month" />
+        </label>
+
+        <nav class="nav-tabs" aria-label="主要视图">
+          <button class="tab-button active" data-tab="dashboard" type="button">总览</button>
+          <button class="tab-button" data-tab="assets" type="button">资产</button>
+          <button class="tab-button" data-tab="transactions" type="button">支出</button>
+          <button class="tab-button" data-tab="liabilities" type="button">负债</button>
+          <button class="tab-button" data-tab="import" type="button">导入</button>
+        </nav>
+
+        <section class="sidebar-panel">
+          <h2>本地数据</h2>
+          <p>所有记录保存在此浏览器的 localStorage，不会上传到服务器。</p>
+          <div class="sidebar-actions">
+            <button id="exportBtn" class="ghost-button" type="button">导出 JSON</button>
+            <button id="clearBtn" class="danger-button" type="button">清空</button>
+          </div>
+        </section>
+      </aside>
+
+      <section class="content">
+        <section class="top-strip">
+          <div>
+            <p class="eyebrow">Asset cockpit</p>
+            <h2 id="pageTitle">财务总览</h2>
+          </div>
+          <div class="top-actions">
+            <div class="anime-card" aria-hidden="true">
+              <div class="mascot-face">
+                <span class="hair"></span>
+                <span class="eye left"></span>
+                <span class="eye right"></span>
+                <span class="mouth"></span>
+              </div>
+              <div>
+                <strong>预算守卫</strong>
+                <small>LIVE · QUEST · RISK</small>
+              </div>
+            </div>
+            <div class="health-score">
+              <span id="healthScore">--</span>
+              <small>资产健康度</small>
+            </div>
+          </div>
+        </section>
+
+        <section class="tab-panel active" id="dashboardPanel">
+          <section class="asset-overview">
+            <article class="asset-hero">
+              <span>总资产</span>
+              <strong id="assetTotal">¥0</strong>
+              <small id="assetCount">0 个账户</small>
+            </article>
+            <article class="metric-card net-worth-card">
+              <span>净资产</span>
+              <strong id="netWorthTotal">¥0</strong>
+              <small>总资产 - 总负债</small>
+            </article>
+            <article class="metric-card liability-card">
+              <span>总负债</span>
+              <strong id="debtDueTotal">¥0</strong>
+              <small id="debtDueCount">0 项负债</small>
+            </article>
+            <article class="metric-card">
+              <span>负债率</span>
+              <strong id="debtRatio">0%</strong>
+              <small>总负债 / 总资产</small>
+            </article>
+          </section>
+
+          <section class="panel sync-panel">
+            <div class="panel-heading">
+              <h3>自动同步</h3>
+              <span id="syncSummary">等待同步</span>
+            </div>
+            <div class="sync-actions">
+              <button id="syncMobileLedgerBtn" class="primary-button" type="button">同步手机记账收入支出</button>
+              <button id="syncInvestmentAssetsBtn" class="ghost-button" type="button">同步股票持仓总资产</button>
+              <button id="importLegacyDataBtn" class="ghost-button" type="button">恢复旧入口数据</button>
+              <a class="ghost-button" href="/voice-ledger-stable/index.html">打开合并版手机记账</a>
+            </div>
+            <p class="status-text" id="syncDetail">打开本页会自动读取手机记账同步文件和股票持仓本地资产数据。</p>
+          </section>
+
+          <div class="dashboard-grid">
+            <section class="panel asset-flow-panel">
+              <div class="panel-heading">
+                <h3>资产组成</h3>
+                <span id="compositionSummary">等待资产</span>
+              </div>
+              <div id="assetFlow" class="asset-flow"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>资产分布</h3>
+                <span id="assetMixSummary">暂无数据</span>
+              </div>
+              <div id="assetMixBars" class="bar-list"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>负债组成</h3>
+                <span id="liabilitySummary">暂无负债</span>
+              </div>
+              <div id="liabilityBars" class="bar-list"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>资产负债对比</h3>
+                <span id="balanceSummary">净资产 ¥0</span>
+              </div>
+              <div id="balanceBars" class="balance-bars"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="assetsPanel">
+          <div class="asset-manager-grid">
+            <section class="panel asset-entry-panel">
+              <div class="panel-heading">
+                <h3>新增资产账户</h3>
+                <span>流动性资产 / 固定资产</span>
+              </div>
+              <form id="assetForm" class="form-grid">
+                <label>
+                  <span>账户名称</span>
+                  <input id="assetName" type="text" placeholder="招商银行卡 / 房子 / 车子" required />
+                </label>
+                <label>
+                  <span>类型</span>
+                  <select id="assetType">
+                    <optgroup label="流动性资产">
+                      <option value="bank">银行卡</option>
+                      <option value="cash">现金</option>
+                      <option value="wallet">微信 / 支付宝</option>
+                      <option value="liquid-other">其他流动资金</option>
+                    </optgroup>
+                    <optgroup label="固定资产">
+                      <option value="fixed-house">房产</option>
+                      <option value="fixed-car">汽车</option>
+                      <option value="fixed-other">其他固定资产</option>
+                    </optgroup>
+                  </select>
+                </label>
+                <label>
+                  <span>当前余额</span>
+                  <input id="assetBalance" type="number" min="0" step="0.01" required />
+                </label>
+                <label>
+                  <span>更新时间</span>
+                  <input id="assetDate" type="date" required />
+                </label>
+                <label class="wide">
+                  <span>备注</span>
+                  <input id="assetNote" type="text" placeholder="可选" />
+                </label>
+                <div class="form-actions wide">
+                  <button id="assetSubmitBtn" class="primary-button" type="submit">添加资产账户</button>
+                  <button id="assetCancelEditBtn" class="ghost-button hidden" type="button">取消修改</button>
+                </div>
+              </form>
+            </section>
+
+            <section class="panel investment-sync-panel">
+              <div class="panel-heading">
+                <h3>投资资产</h3>
+                <span id="investmentAssetSummary">等待同步</span>
+              </div>
+              <div class="sync-actions asset-sync-actions">
+                <button id="syncInvestmentAssetsBtn2" class="ghost-button compact" type="button">从股票持仓同步总资产</button>
+                <a class="ghost-button compact" href="/洒一投资工具箱/股票持仓.html">打开股票持仓</a>
+              </div>
+              <div id="investmentAssetList" class="debt-list"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>流动性资产</h3>
+                <span id="liquidAssetSummary">暂无</span>
+              </div>
+              <div id="liquidAssetList" class="debt-list"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>固定资产</h3>
+                <span id="fixedAssetSummary">暂无</span>
+              </div>
+              <div id="fixedAssetList" class="debt-list"></div>
+            </section>
+
+            <section class="panel analysis-panel">
+              <div class="panel-heading">
+                <h3>资产饼图分析</h3>
+                <span id="assetPieSummary">暂无数据</span>
+              </div>
+              <div id="assetPieAnalysis" class="pie-analysis"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="transactionsPanel">
+          <div class="work-grid">
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>新增流水</h3>
+                <span>收入或支出</span>
+              </div>
+              <form id="transactionForm" class="form-grid">
+                <label>
+                  <span>日期</span>
+                  <input id="txDate" type="date" required />
+                </label>
+                <label>
+                  <span>类型</span>
+                  <select id="txType">
+                    <option value="expense">支出</option>
+                    <option value="income">收入</option>
+                  </select>
+                </label>
+                <label>
+                  <span>金额</span>
+                  <input id="txAmount" type="number" min="0" step="0.01" placeholder="0.00" required />
+                </label>
+                <label>
+                  <span>分类</span>
+                  <select id="txCategory"></select>
+                </label>
+                <label class="wide">
+                  <span>商户 / 来源</span>
+                  <input id="txMerchant" type="text" placeholder="例如：盒马、工资、房租" required />
+                </label>
+                <label class="wide">
+                  <span>备注</span>
+                  <input id="txNote" type="text" placeholder="可选" />
+                </label>
+                <button class="primary-button wide" type="submit">添加流水</button>
+              </form>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>本月流水</h3>
+                <button id="deleteSelectedBtn" class="ghost-button compact" type="button">删除选中</button>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th><input id="selectAllTx" type="checkbox" aria-label="全选流水" /></th>
+                      <th>日期</th>
+                      <th>类型</th>
+                      <th>分类</th>
+                      <th>商户</th>
+                      <th>备注</th>
+                      <th>金额</th>
+                    </tr>
+                  </thead>
+                  <tbody id="transactionTable"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="liabilitiesPanel">
+          <div class="work-grid">
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>新增负债账户</h3>
+                <span>信用卡 / 贷款</span>
+              </div>
+              <form id="debtForm" class="form-grid">
+                <label>
+                  <span>名称</span>
+                  <input id="debtName" type="text" placeholder="招商信用卡 / 房贷" required />
+                </label>
+                <label>
+                  <span>类型</span>
+                  <select id="debtType">
+                    <option value="credit">信用卡</option>
+                    <option value="loan">贷款</option>
+                  </select>
+                </label>
+                <label>
+                  <span>当前负债</span>
+                  <input id="debtDue" type="number" min="0" step="0.01" required />
+                </label>
+                <label>
+                  <span>还款日</span>
+                  <input id="debtDay" type="number" min="1" max="31" placeholder="18" required />
+                </label>
+                <label class="wide">
+                  <span>备注</span>
+                  <input id="debtNote" type="text" placeholder="账单日、分期说明等" />
+                </label>
+                <div class="form-actions wide">
+                  <button id="debtSubmitBtn" class="primary-button" type="submit">添加负债</button>
+                  <button id="debtCancelEditBtn" class="ghost-button hidden" type="button">取消修改</button>
+                </div>
+              </form>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>负债清单</h3>
+                <span id="repaymentSummary">暂无</span>
+              </div>
+              <div id="debtList" class="debt-list"></div>
+            </section>
+
+            <section class="panel analysis-panel">
+              <div class="panel-heading">
+                <h3>负债饼图分析</h3>
+                <span id="debtPieSummary">暂无数据</span>
+              </div>
+              <div id="debtPieAnalysis" class="pie-analysis"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="importPanel">
+          <div class="work-grid">
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>上传账单</h3>
+                <span>鲨鱼记账 / 支付宝 / 微信 CSV、TXT 或 JSON</span>
+              </div>
+              <div class="upload-box">
+                <input id="billFile" type="file" accept=".csv,.txt,.json" multiple />
+                <p>选择鲨鱼记账、支付宝、微信导出的账单文件，或手机记账导出的 JSON，系统会识别时间、金额、收支类型、分类、账户和备注。</p>
+              </div>
+              <div class="import-options">
+                <label>
+                  <span>来源</span>
+                  <select id="importSource">
+                    <option value="auto">自动识别</option>
+                    <option value="alipay">支付宝</option>
+                    <option value="wechat">微信</option>
+                  </select>
+                </label>
+                <button id="importBtn" class="primary-button" type="button">导入账单</button>
+              </div>
+              <p id="importStatus" class="status-text">尚未选择文件。</p>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>导入预览</h3>
+                <span id="previewCount">0 条</span>
+              </div>
+              <div class="table-wrap preview">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>日期</th>
+                      <th>类型</th>
+                      <th>分类</th>
+                      <th>商户</th>
+                      <th>备注</th>
+                      <th>金额</th>
+                    </tr>
+                  </thead>
+                  <tbody id="previewTable"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="../site-auto-backup.js"></script>
+    <script src="./app.js?v=20260816-auto-sync"></script>
+  </body>
+</html>

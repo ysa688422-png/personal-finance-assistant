@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>长桥数据 · 个人财务助理</title>
+  <style>
+    :root{color-scheme:light;--ink:#24313c;--muted:#67727a;--green:#38594a;--line:#deded4;--paper:#faf9f5}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 system-ui,-apple-system,"PingFang SC",sans-serif}
+    main{max-width:1080px;margin:auto;padding:52px 28px 80px}a{color:var(--green)}nav{display:flex;flex-wrap:wrap;gap:12px 28px;border-bottom:1px solid var(--line);padding-bottom:20px}
+    h1{font-size:42px;line-height:1.2;letter-spacing:-1px;margin:42px 0 18px}h2{font-size:23px;margin:0 0 8px}.lead{max-width:700px;color:var(--muted)}
+    .eyebrow{color:var(--green);font-size:12px;letter-spacing:2px;margin-top:32px}.status{border-left:3px solid var(--green);padding:12px 18px;background:#efefe7;margin:30px 0}
+    section{border-top:1px solid var(--line);padding:30px 0}.description{color:var(--muted);max-width:750px}.form{display:flex;flex-wrap:wrap;align-items:end;gap:12px;margin:18px 0}
+    label{display:grid;gap:5px;font-size:14px}input{font:inherit;background:white;border:1px solid #babfb8;border-radius:6px;padding:10px 12px;min-width:240px}input[type=date]{min-width:160px}
+    button{font:inherit;cursor:pointer;background:var(--green);color:white;padding:11px 19px;border:0;border-radius:6px}button:disabled{opacity:.55;cursor:wait}.secondary{background:#e7eae1;color:var(--green)}
+    .result{min-height:32px;overflow-x:auto;font-size:14px}.result:empty{display:none}.notice{color:var(--muted);font-size:13px}.error{color:#9b342f}.table{border-collapse:collapse;width:100%;margin:12px 0;font-variant-numeric:tabular-nums}
+    th,td{border-bottom:1px solid var(--line);padding:10px 12px;text-align:left;white-space:nowrap}th{color:var(--muted);font-weight:500}footer{color:var(--muted);font-size:13px;margin-top:28px}
+    @media(max-width:600px){main{padding:25px 18px 50px}h1{font-size:32px}input{min-width:0;width:100%}.form label{flex:1 1 100%}.form button{width:100%}}
+  </style>
+  <script defer src="./longbridge-panel.js"></script>
+</head>
+<body>
+<main>
+  <nav aria-label="投资模块">
+    <a href="./index.html">个人财务与投资</a>
+    <a href="./股票持仓.html">正股</a>
+    <a href="./日内期权交易记录.html">期权</a>
+    <a href="./洒一开户奖励.html">港股开户与拉新优惠</a>
+    <a href="./洒一港股打新.html">港股打新</a>
+  </nav>
+  <div class="eyebrow">PERSONAL FINANCE ASSISTANT / DATA</div>
+  <h1>把记录与数据连接起来。</h1>
+  <p class="lead">正股、期权、港股打新共用长桥 API。手动发起查询，保留上游的币种、时间与返回范围，方便把自己的判断放回当时的事实里。</p>
+  <div id="connection" class="status" role="status">尚未检查本机网关。数据只在查询时读取。</div>
+  <button class="secondary" id="check-connection" type="button">检查连接配置</button>
+  <section>
+    <h2>正股报价</h2>
+    <p class="description">输入完整证券代码。面板展示长桥返回的价格与时间，行情权限可能影响可读取范围及延迟。</p>
+    <form id="quote-form" class="form">
+      <label>证券代码（逗号分隔）<input id="quote-symbols" placeholder="代码 + .US / .HK / .SH / .SZ / .SG" required autocomplete="off"></label>
+      <button type="submit">读取报价</button>
+    </form>
+    <div id="quote-result" class="result" aria-live="polite"></div>
+  </section>
+  <section>
+    <h2>期权报价</h2>
+    <p class="description">请提供长桥支持的完整期权合约代码。返回价格、到期日、行权价、合约乘数等字段，缺失字段保持空缺。</p>
+    <form id="option-form" class="form">
+      <label>期权合约代码<input id="option-symbols" placeholder="完整合约代码（含市场后缀）" required autocomplete="off"></label>
+      <button type="submit">读取期权</button>
+    </form>
+    <div id="option-result" class="result" aria-live="polite"></div>
+  </section>
+  <section>
+    <h2>汇率</h2>
+    <p class="description">按长桥直接返回的币种对展示。每一行说明 1 单位原币对应多少目标币；接口没有提供汇率更新时间，另列本次查询时间。</p>
+    <div class="form"><button id="read-rates" type="button">读取汇率</button></div>
+    <div id="rates-result" class="result" aria-live="polite"></div>
+  </section>
+  <section>
+    <h2>港股 IPO 日历</h2>
+    <p class="description">读取指定区间的 IPO 日历。日历事件与个人申购、中签、奖励是不同记录；本面板仅展示日历。</p>
+    <form id="ipo-form" class="form">
+      <label>开始日期<input id="ipo-start" type="date" required></label>
+      <label>结束日期<input id="ipo-end" type="date" required></label>
+      <button type="submit">读取日历</button>
+    </form>
+    <div id="ipo-result" class="result" aria-live="polite"></div>
+  </section>
+  <section>
+    <h2>我的持仓</h2>
+    <p class="description">仅在本机网关启用持仓读取后可用，点击才会读取当前账户。结果留在当前页面，不同步到原持仓记录，不保存到浏览器或仓库。</p>
+    <div class="form"><button id="read-positions" type="button">手动读取我的持仓</button><button id="clear-positions" class="secondary" type="button">清除页面上的持仓</button></div>
+    <div id="positions-result" class="result" aria-live="polite"></div>
+  </section>
+  <section>
+    <h2>开户与拉新优惠</h2>
+    <p class="description">本项目尚未接入开户奖励、邀请返佣或优惠资格接口。活动条款与核验记录由你在<a href="./洒一开户奖励.html">奖励模块</a>手工维护，并标注为用户输入。</p>
+  </section>
+  <footer>唯一外部投资数据源：长桥 API。查询失败会明确显示，页面没有预置行情。部署方式见仓库 docs/longbridge.md。静态 GitHub 页面展示代码与结构，实时查询需要本机网关。</footer>
+</main>
+</body>
+</html>

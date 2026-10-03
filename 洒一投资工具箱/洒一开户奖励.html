@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#ff6b9d">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>洒一开户奖励 - 二次元投资作战室</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../site-auto-backup.js"></script>
+    <script src="./auto-backup.js"></script>
+    <link rel="stylesheet" href="../music-player.css?v=20260824b">
+    <script defer src="../music-player.js?v=20260824b" data-page="rewards"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #ff6b9d;
+            --secondary: #c44569;
+            --accent: #f8b500;
+            --dark: #1a1a2e;
+            --darker: #16213e;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --chainsaw-red: #ff2d55;
+            --mygo-cyan: #00d9ff;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+        
+        .back-link {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.9em;
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-50%) scale(1.05);
+        }
+        
+        .header h1 {
+            color: #fff;
+            font-size: 2.5em;
+            text-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+        }
+        
+        .form-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+        
+        .form-section h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .form-group {
+            margin-bottom: 12px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+            font-size: 0.9em;
+        }
+        
+        .currency-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .currency-select {
+            width: 80px;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #f8f9fa;
+            cursor: pointer;
+        }
+        
+        .currency-select:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group input[type="month"],
+        .form-group input[type="date"] {
+            flex: 1;
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b9d, #c44569);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 157, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            margin-top: 8px;
+        }
+        
+        .list-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+        
+        .list-section h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85em;
+        }
+        
+        th, td {
+            padding: 8px 6px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.85em;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        td[data-label="状态"],
+        th:nth-child(11) {
+            min-width: 78px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        
+        .positive { color: #28a745; }
+        .negative { color: #dc3545; }
+        
+        .btn-edit {
+            background: #ffc107;
+            color: #333;
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-right: 3px;
+        }
+        
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        
+        .stats-section {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .stat-value .currency-breakdown {
+            display: block;
+            margin-top: 6px;
+            color: #666;
+            font-size: 0.45em;
+            line-height: 1.5;
+            font-weight: 600;
+        }
+        
+        .stat-label {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 58px;
+            min-height: 24px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            line-height: 1;
+        }
+        
+        .status-pending { background: #fff4bf; color: #8a6100; border: 1px solid #ffd24a; }
+        .status-received { background: #dcf8e6; color: #14733a; border: 1px solid #7dd89d; }
+        .status-expired { background: #ffe0e6; color: #b4233f; border: 1px solid #ff8aa0; }
+        
+        .exchange-rate {
+            background: rgba(255, 255, 255, 0.14);
+            padding: 10px 14px;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+        }
+        
+        .exchange-rate input {
+            width: 72px;
+            min-height: 30px;
+            padding: 5px 8px;
+            border: 1px solid rgba(255,255,255,0.24);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .exchange-rate .btn {
+            width: auto;
+            min-height: 30px;
+            margin: 0;
+            padding: 5px 14px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.88);
+            color: #263043;
+            font-weight: 700;
+        }
+
+        #rateTime {
+            color: rgba(255, 255, 255, 0.64) !important;
+            font-size: 0.82em !important;
+        }
+        
+        .total-cell {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        /* 飞行员黑猫装饰 */
+        .pilot-cat {
+            position: fixed;
+            top: 15%;
+            right: 3%;
+            width: 160px;
+            height: 160px;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.8;
+            animation: floatCat 4s ease-in-out infinite;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .pilot-cat img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        @keyframes floatCat {
+            0%, 100% { transform: translateY(0) rotate(-2deg); }
+            50% { transform: translateY(-15px) rotate(2deg); }
+        }
+        
+        /* 街头风格人物装饰 */
+        .street-style {
+            position: fixed;
+            bottom: 25%;
+            left: 2%;
+            width: 140px;
+            height: 175px;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.75;
+            animation: bounceStyle 3s ease-in-out infinite;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .street-style img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        @keyframes bounceStyle {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.02); }
+        }
+    
+
+/* ===== 手机端/数据安全补丁：自动生成，不影响原有数据 ===== */
+@media (max-width: 768px) {
+  body { padding: 10px; }
+  .main-content, .main-grid, .tools-grid, .charts-grid, .stats-grid, .stats-section, .assets-multi-currency { grid-template-columns: 1fr !important; }
+  .left-column, .right-column, .form-section, .list-section, .card, .table-section, .chart-card, .stat-card { width: 100%; padding: 14px; border-radius: 12px; }
+  .header { padding: 16px 12px; margin-bottom: 16px; }
+  .header h1 { font-size: 1.6rem !important; }
+  .header::before, .header::after, .anime-character, .floating-symbol, .music-note, .chainsaw-icon, .deco-img, .pilot-cat, .street-style, .pochita, .tomori { display: none !important; }
+  .back-link { position: static !important; display: inline-block; transform: none !important; margin-bottom: 10px; }
+  .flex-row, .form-row, .currency-row { flex-direction: column; align-items: stretch; }
+  input, select, button { min-height: 44px; font-size: 16px !important; }
+  .chart-container { height: 240px; }
+  table thead { display: none; }
+  table, tbody, tr, td { display: block; width: 100%; }
+  tr { margin-bottom: 12px; padding: 12px; border-radius: 12px; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+  td { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid #eee; text-align: right; word-break: break-word; }
+  td::before { content: attr(data-label); font-weight: 600; color: #666; text-align: left; flex: 0 0 42%; }
+  td.empty-state { display: block; text-align: center; }
+  td.empty-state::before { content: ''; }
+}
+
+</style>
+    <link rel="stylesheet" href="../sayi-anime-theme.css?v=20260621-cream2">
+    <script src="./longbridge-rates.js"></script>
+</head>
+<body>
+<nav data-public-navigation style="padding:10px 20px;background:#f7f1e9;color:#413831;font:14px sans-serif;position:relative;z-index:10"><a href="./index.html">投资工具箱</a> · <a href="./长桥数据.html">长桥数据</a> · <a href="../index.html">个人财务与投资</a></nav>
+    <!-- 飞行员黑猫 -->
+    <div class="pilot-cat">
+        <img src="../品牌资产/角色立绘/紫铃.png" alt="飞行员黑猫">
+    </div>
+    
+    <!-- 街头风格人物 -->
+    <div class="street-style">
+        <img src="../品牌资产/角色立绘/紫铃.png" alt="街头风格">
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="back-link">← 返回工具箱</a>
+            <h1>📊 洒一开户奖励</h1>
+            <p style="color: #888;">洒一二次元投资作战室</p>
+        </div>
+        
+        <div class="exchange-rate">
+            <span>汇率（长桥 API / 手工输入）：</span>
+            <span>USD: <input type="number" id="rateUSD" value="7.25" step="0.0001" readonly></span>
+            <span>HKD: <input type="number" id="rateHKD" value="0.92" step="0.0001" readonly></span>
+            <button class="btn" onclick="fetchExchangeRates()">刷新长桥汇率</button> <button type="button" class="btn" style="width:auto" onclick="editManualExchangeRates()">设置手工汇率</button>
+            <span id="rateTime"></span>
+        </div>
+        
+        <div class="main-content">
+            <div class="form-section">
+                <h2>➕ 添加/编辑奖励</h2>
+                
+                <div class="form-group">
+                    <label>券商名称</label>
+                    <input type="text" id="broker" placeholder="如：富途、老虎等">
+                </div>
+                
+                <div class="form-group">
+                    <label>交易费返还</label>
+                    <div class="currency-row">
+                        <select id="feeReturnCurrency" class="currency-select">
+                            <option value="CNY">CNY</option>
+                            <option value="USD">USD</option>
+                            <option value="HKD">HKD</option>
+                        </select>
+                        <input type="number" id="feeReturn" placeholder="负数为支出" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>现金券</label>
+                    <div class="currency-row">
+                        <select id="cashCouponCurrency" class="currency-select">
+                            <option value="CNY">CNY</option>
+                            <option value="USD" selected>USD</option>
+                            <option value="HKD">HKD</option>
+                        </select>
+                        <input type="number" id="cashCoupon" placeholder="正数为收入" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>股票奖励</label>
+                    <div class="currency-row">
+                        <select id="stockRewardCurrency" class="currency-select">
+                            <option value="CNY">CNY</option>
+                            <option value="USD" selected>USD</option>
+                            <option value="HKD">HKD</option>
+                        </select>
+                        <input type="number" id="stockReward" placeholder="股票奖励金额" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>财哥奖励</label>
+                    <div class="currency-row">
+                        <select id="caigeCurrency" class="currency-select">
+                            <option value="CNY" selected>CNY</option>
+                            <option value="USD">USD</option>
+                            <option value="HKD">HKD</option>
+                        </select>
+                        <input type="number" id="caige" placeholder="正数为收入" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>开户时间</label>
+                    <input type="date" id="openTime">
+                </div>
+                
+                <div class="form-group">
+                    <label>领取时间</label>
+                    <input type="month" id="receiveTime">
+                </div>
+                
+                <div class="form-group">
+                    <label>实际到账总值（可选）</label>
+                    <div class="currency-row">
+                        <select id="actualValueCurrency" class="currency-select">
+                            <option value="CNY" selected>CNY</option>
+                            <option value="USD">USD</option>
+                            <option value="HKD">HKD</option>
+                        </select>
+                        <input type="number" id="actualValue" placeholder="不填则按上方项目自动计算" step="0.01">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>过期时间（可选）</label>
+                    <input type="month" id="expireTime">
+                </div>
+
+                <div class="form-group">
+                    <label>备注（可选）</label>
+                    <input type="text" id="note" placeholder="任务要求/限制/提醒">
+                </div>
+
+                <div class="form-group">
+                    <label>领取状况</label>
+                    <select id="status" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                        <option value="pending">待领取</option>
+                        <option value="received">已领取</option>
+                        <option value="expired">已过期</option>
+                    </select>
+                </div>
+                
+                <button class="btn btn-primary" id="addBtn" onclick="addAccount()">➕ 添加奖励记录</button>
+                <button class="btn btn-secondary" onclick="clearForm()">清空</button>
+            </div>
+            
+            <div class="list-section">
+                <h2>📋 奖励记录列表</h2>
+                <div style="overflow-x: auto;">
+                    <table id="accountTable">
+                        <thead>
+                            <tr>
+                                <th>券商</th>
+                                <th>交易费返还</th>
+                                <th>现金券</th>
+                                <th>股票奖励</th>
+                                <th>财哥</th>
+                                <th>开户时间</th>
+                                <th>领取时间</th>
+                                <th>过期时间</th>
+                                <th>预期(CNY)</th>
+                                <th>实际到账</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-value" id="totalAccounts">0</div>
+                <div class="stat-label">券商数量</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalFeeReturn">0.00</div>
+                <div class="stat-label">交易费返还</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalCashCoupon">0.00</div>
+                <div class="stat-label">现金券</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalStockReward">0.00</div>
+                <div class="stat-label">股票奖励</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalCaige">0.00</div>
+                <div class="stat-label">财哥奖励</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalReward">0.00</div>
+                <div class="stat-label">总奖励</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 数据存储
+        let accounts = [];
+        let editingId = null;
+        let exchangeRates = { USD: 1, HKD: 1 }; // 演示占位值，必须自行维护或读取长桥汇率
+
+        function createSafeNumericId() { return Date.now() + Math.floor(Math.random() * 1000) / 1000; }
+        function activeAccounts() { return accounts.filter(a => !a.deleted); }
+        function normalizeAccount(account) {
+            const expectedValue = account.expectedValue ?? null;
+            return {
+                ...account,
+                id: account.id || createSafeNumericId(),
+                broker: account.broker || '',
+                feeReturn: Number(account.feeReturn || 0),
+                cashCoupon: Number(account.cashCoupon || 0),
+                stockReward: Number(account.stockReward || 0),
+                caige: Number(account.caige || 0),
+                actualValue: account.actualValue === '' || account.actualValue === undefined ? null : Number(account.actualValue),
+                expectedValue,
+                openTime: normalizeDateValue(account.openTime),
+                expireTime: account.expireTime || '',
+                note: account.note || '',
+                deleted: Boolean(account.deleted),
+                deletedAt: account.deletedAt || ''
+            };
+        }
+        function createLocalSafetyBackup(reason) {
+            try {
+                const key = 'sayi_account_local_backups_v1';
+                const backups = JSON.parse(localStorage.getItem(key) || '[]');
+                backups.unshift({ reason, time: new Date().toISOString(), data: localStorage.getItem('accountRewards_v4') });
+                localStorage.setItem(key, JSON.stringify(backups.slice(0, 20)));
+            } catch(e) { console.warn('开户奖励本地备份失败', e); }
+        }
+
+        // 转换为CNY
+        function toCNY(amount, currency) {
+            if (currency === 'USD') return amount * exchangeRates.USD;
+            if (currency === 'HKD') return amount * exchangeRates.HKD;
+            return amount;
+        }
+
+        function formatRewardCurrencies(cny) {
+            const value = Number(cny || 0);
+            const hkd = exchangeRates.HKD > 0 ? value / exchangeRates.HKD : 0;
+            const usd = exchangeRates.USD > 0 ? value / exchangeRates.USD : 0;
+            return `¥${value.toFixed(2)}<span class="currency-breakdown">HKD ${hkd.toFixed(2)}｜USD ${usd.toFixed(2)}</span>`;
+        }
+
+        // 获取汇率（长桥 API / 手工输入）（长桥 API；不使用其他外部数据源）
+        const GLOBAL_FX_KEY = 'sayi_exchange_rates_v2';
+
+        function readSavedExchangeRates() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(GLOBAL_FX_KEY) || 'null');
+                if (saved && Number(saved.USD) > 0 && Number(saved.HKD) > 0) {
+                    exchangeRates.USD = Number(saved.USD);
+                    exchangeRates.HKD = Number(saved.HKD);
+                    updateExchangeRateDisplay(saved.updatedAt, saved.source || '本地缓存');
+                }
+            } catch (e) {
+                console.warn('读取本地汇率缓存失败', e);
+            }
+        }
+
+        function saveExchangeRatesToCache(source) {
+            localStorage.setItem(GLOBAL_FX_KEY, JSON.stringify({
+                USD: exchangeRates.USD,
+                HKD: exchangeRates.HKD,
+                source,
+                updatedAt: new Date().toISOString()
+            }));
+        }
+
+        function updateExchangeRateDisplay(updatedAt, source) {
+            document.getElementById('rateUSD').value = Number(exchangeRates.USD).toFixed(4);
+            document.getElementById('rateHKD').value = Number(exchangeRates.HKD).toFixed(4);
+            const timeText = updatedAt ? new Date(updatedAt).toLocaleString('zh-CN') : '未确认';
+            document.getElementById('rateTime').textContent = `更新时间: ${timeText}${source ? '｜来源: ' + source : ''}`;
+        }
+
+
+        function showExchangeRateFailureAlert(error) {
+            const msg = error && error.message ? error.message : '未知错误';
+            alert('汇率更新失败，请进一步修复。\n\n当前已继续使用本地缓存/旧汇率，不会影响你现有数据。\n\n错误信息：' + msg);
+        }
+
+        function withFreshUrl(url) {
+            const separator = url.includes('?') ? '&' : '?';
+            return url + separator + '_t=' + Date.now();
+        }
+
+        async function fetchJsonWithTimeout(url, timeoutMs = 8000) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                const response = await fetch(withFreshUrl(url), {
+                    cache: 'no-store',
+                    signal: controller.signal,
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!response.ok) throw new Error('HTTP ' + response.status + '：' + url);
+                return await response.json();
+            } finally {
+                clearTimeout(timer);
+            }
+        }
+
+        function applyFetchedRates(usdPerCny, hkdPerCny, source) {
+            if (!(Number(usdPerCny) > 0) || !(Number(hkdPerCny) > 0)) {
+                throw new Error(source + ' 返回的汇率字段无效');
+            }
+            exchangeRates.USD = 1 / Number(usdPerCny);
+            exchangeRates.HKD = 1 / Number(hkdPerCny);
+            saveExchangeRatesToCache(source);
+            updateExchangeRateDisplay(new Date().toISOString(), source);
+        }
+
+
+
+
+
+
+        async function fetchExchangeRates() {
+            const status = document.getElementById('rateUpdateTime') || document.getElementById('rateTime');
+            if (status) status.textContent = '正在读取长桥汇率...';
+            try {
+                const values = await window.sayiLongbridgeRates.read();
+                exchangeRates.USD = values.USD;
+                exchangeRates.HKD = values.HKD;
+                localStorage.setItem(GLOBAL_FX_KEY, JSON.stringify({ USD: values.USD, HKD: values.HKD, source: values.source, updatedAt: values.queriedAt }));
+                updateExchangeRateDisplay(values.queriedAt, values.source);
+                updateTable(); updateStats();
+            } catch (error) {
+                readSavedExchangeRates();
+                updateExchangeRateDisplay(null, '长桥暂不可用；现有值是手工值/缓存/演示值，不能视为实时汇率');
+                if (status) status.textContent += '｜' + (error.name === 'AbortError' ? '请求超时' : error.message);
+            }
+        }
+
+        function editManualExchangeRates() {
+            const usd = prompt('手工汇率：1 USD = 多少 CNY？此值不会标记为实时行情。', String(exchangeRates.USD));
+            if (usd === null) return;
+            const hkd = prompt('手工汇率：1 HKD = 多少 CNY？', String(exchangeRates.HKD));
+            if (hkd === null) return;
+            if (!(Number(usd) > 0 && Number(hkd) > 0) || !Number.isFinite(Number(usd)) || !Number.isFinite(Number(hkd))) { alert('请输入有效的正数。'); return; }
+            exchangeRates.USD = Number(usd);
+            exchangeRates.HKD = Number(hkd);
+            saveExchangeRatesToCache('用户手工输入');
+            updateExchangeRateDisplay(new Date().toISOString(), '用户手工输入');
+            updateTable(); updateStats();
+        }
+
+        // 计算单条记录的汇总（CNY）
+        function calculateRowTotal(account) {
+            const feeReturnCNY = toCNY(account.feeReturn || 0, account.feeReturnCurrency || 'CNY');
+            const cashCouponCNY = toCNY(account.cashCoupon || 0, account.cashCouponCurrency || 'CNY');
+            const stockRewardCNY = toCNY(account.stockReward || 0, account.stockRewardCurrency || 'CNY');
+            const caigeCNY = toCNY(account.caige || 0, account.caigeCurrency || 'CNY');
+            return feeReturnCNY + cashCouponCNY + stockRewardCNY + caigeCNY;
+        }
+
+        function normalizeDateValue(value) {
+            if (!value) return '';
+            const text = String(value);
+            if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
+            if (/^\d{4}-\d{2}$/.test(text)) return `${text}-01`;
+            return text;
+        }
+
+        // 添加/编辑账户
+        function addAccount() {
+            console.log('addAccount被调用，editingId:', editingId);
+            
+            const broker = document.getElementById('broker').value.trim();
+            const feeReturn = parseFloat(document.getElementById('feeReturn').value) || 0;
+            const feeReturnCurrency = document.getElementById('feeReturnCurrency').value;
+            const cashCoupon = parseFloat(document.getElementById('cashCoupon').value) || 0;
+            const cashCouponCurrency = document.getElementById('cashCouponCurrency').value;
+            const stockReward = parseFloat(document.getElementById('stockReward').value) || 0;
+            const stockRewardCurrency = document.getElementById('stockRewardCurrency').value;
+            const caige = parseFloat(document.getElementById('caige').value) || 0;
+            const caigeCurrency = document.getElementById('caigeCurrency').value;
+            const openTime = normalizeDateValue(document.getElementById('openTime').value);
+            const receiveTime = document.getElementById('receiveTime').value;
+            const actualValueRaw = document.getElementById('actualValue')?.value;
+            const actualValue = actualValueRaw === '' || actualValueRaw === undefined ? null : parseFloat(actualValueRaw);
+            const actualValueCurrency = document.getElementById('actualValueCurrency')?.value || 'CNY';
+            const expireTime = document.getElementById('expireTime')?.value || '';
+            const note = document.getElementById('note')?.value.trim() || '';
+            const status = document.getElementById('status').value;
+
+            if (!broker) {
+                alert('请输入券商名称');
+                return;
+            }
+
+            if (editingId) {
+                // 编辑模式
+                console.log('进入编辑模式，ID:', editingId);
+                const index = accounts.findIndex(a => a.id === editingId);
+                if (index !== -1) {
+                    accounts[index] = {
+                        id: editingId,
+                        broker, feeReturn, feeReturnCurrency,
+                        cashCoupon, cashCouponCurrency,
+                        stockReward, stockRewardCurrency,
+                        caige, caigeCurrency,
+                        openTime, receiveTime, actualValue, actualValueCurrency, expireTime, note, status
+                    };
+                    console.log('记录已更新:', accounts[index]);
+                } else {
+                    console.error('找不到要编辑的记录');
+                }
+                editingId = null;
+                document.getElementById('addBtn').textContent = '➕ 添加奖励记录';
+            } else {
+                // 添加模式
+                console.log('进入添加模式');
+                const newId = createSafeNumericId();
+                accounts.push({
+                    id: newId,
+                    broker, feeReturn, feeReturnCurrency,
+                    cashCoupon, cashCouponCurrency,
+                    stockReward, stockRewardCurrency,
+                    caige, caigeCurrency,
+                    openTime, receiveTime, actualValue, actualValueCurrency, expireTime, note, status
+                });
+                console.log('新记录已添加，ID:', newId);
+            }
+
+            updateTable();
+            updateStats();
+            clearForm();
+            saveData();
+        }
+
+        // 编辑账户 - 修复版
+        function editAccount(id) {
+            console.log('编辑按钮被点击，ID:', id);
+            
+            // 确保id是数字
+            const targetId = Number(id);
+            
+            const account = accounts.find(a => a.id === targetId);
+            if (!account) {
+                alert('找不到该记录，ID: ' + targetId);
+                console.error('找不到记录，当前accounts:', accounts);
+                return;
+            }
+
+            console.log('找到记录:', account);
+            
+            editingId = targetId;
+
+            // 填充表单
+            document.getElementById('broker').value = account.broker || '';
+            document.getElementById('feeReturn').value = account.feeReturn || '';
+            document.getElementById('feeReturnCurrency').value = account.feeReturnCurrency || 'CNY';
+            document.getElementById('cashCoupon').value = account.cashCoupon || '';
+            document.getElementById('cashCouponCurrency').value = account.cashCouponCurrency || 'USD';
+            document.getElementById('stockReward').value = account.stockReward || '';
+            document.getElementById('stockRewardCurrency').value = account.stockRewardCurrency || 'USD';
+            document.getElementById('caige').value = account.caige || '';
+            document.getElementById('caigeCurrency').value = account.caigeCurrency || 'CNY';
+            document.getElementById('openTime').value = normalizeDateValue(account.openTime);
+            document.getElementById('receiveTime').value = account.receiveTime || '';
+            if (document.getElementById('actualValue')) document.getElementById('actualValue').value = account.actualValue ?? '';
+            if (document.getElementById('actualValueCurrency')) document.getElementById('actualValueCurrency').value = account.actualValueCurrency || 'CNY';
+            if (document.getElementById('expireTime')) document.getElementById('expireTime').value = account.expireTime || '';
+            if (document.getElementById('note')) document.getElementById('note').value = account.note || '';
+            document.getElementById('status').value = account.status || 'pending';
+
+            // 修改按钮文字
+            document.getElementById('addBtn').textContent = '💾 保存修改';
+
+            // 滚动到表单
+            document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
+            
+            console.log('编辑模式已激活，editingId:', editingId);
+        }
+
+        // 删除账户
+        function deleteAccount(id) {
+            if (confirm('确定要删除这条记录吗？\n\n这次不会真正删除，会放入本地回收标记。')) {
+                createLocalSafetyBackup('before_soft_delete_account');
+                const account = accounts.find(a => a.id === id);
+                if (account) {
+                    account.deleted = true;
+                    account.deletedAt = new Date().toISOString();
+                }
+                if (editingId === id) clearForm();
+                updateTable();
+                updateStats();
+                saveData();
+            }
+        }
+
+        // 更新表格
+        function updateTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            activeAccounts().forEach(account => {
+                const statusText = { pending: '待领取', received: '已领取', expired: '已过期' }[account.status];
+                const rowTotal = calculateRowTotal(account);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td data-label="券商">${account.broker}</td>
+                    <td data-label="交易费返还" class="${account.feeReturn >= 0 ? 'positive' : 'negative'}">
+                        ${account.feeReturnCurrency || 'CNY'} ${account.feeReturn >= 0 ? '+' : ''}${(account.feeReturn || 0).toFixed(2)}
+                    </td>
+                    <td data-label="现金券" class="positive">
+                        ${account.cashCouponCurrency || 'CNY'} +${(account.cashCoupon || 0).toFixed(2)}
+                    </td>
+                    <td data-label="股票奖励" class="positive">
+                        ${account.stockRewardCurrency || 'USD'} +${(account.stockReward || 0).toFixed(2)}
+                    </td>
+                    <td data-label="财哥" class="positive">
+                        ${account.caigeCurrency || 'CNY'} +${(account.caige || 0).toFixed(2)}
+                    </td>
+                    <td data-label="开户时间">${normalizeDateValue(account.openTime) || '-'}</td>
+                    <td data-label="领取时间">${account.receiveTime || '-'}</td>
+                    <td data-label="过期时间">${account.expireTime || '-'}</td>
+                    <td data-label="预期(CNY)" class="total-cell">¥${rowTotal.toFixed(2)}</td>
+                    <td data-label="实际到账" class="total-cell">${account.actualValue !== null && account.actualValue !== undefined ? `${account.actualValueCurrency || 'CNY'} ${Number(account.actualValue).toFixed(2)}<br><small>¥${toCNY(Number(account.actualValue), account.actualValueCurrency || 'CNY').toFixed(2)}</small>` : '-'}</td>
+                    <td data-label="状态"><span class="status-badge status-${account.status}">${statusText}</span></td>
+                    <td data-label="操作">
+                        <button class="btn-edit" onclick="editAccount(${account.id})" type="button">编辑</button>
+                        <button class="btn-delete" onclick="deleteAccount(${account.id})" type="button">删除</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // 更新统计
+        function updateStats() {
+            let totalFeeReturn = 0, totalCashCoupon = 0, totalStockReward = 0, totalCaige = 0;
+
+            activeAccounts().forEach(account => {
+                totalFeeReturn += toCNY(account.feeReturn || 0, account.feeReturnCurrency || 'CNY');
+                totalCashCoupon += toCNY(account.cashCoupon || 0, account.cashCouponCurrency || 'CNY');
+                totalStockReward += toCNY(account.stockReward || 0, account.stockRewardCurrency || 'CNY');
+                totalCaige += toCNY(account.caige || 0, account.caigeCurrency || 'CNY');
+            });
+
+            document.getElementById('totalAccounts').textContent = activeAccounts().length;
+            document.getElementById('totalFeeReturn').innerHTML = formatRewardCurrencies(totalFeeReturn);
+            document.getElementById('totalCashCoupon').innerHTML = formatRewardCurrencies(totalCashCoupon);
+            document.getElementById('totalStockReward').innerHTML = formatRewardCurrencies(totalStockReward);
+            document.getElementById('totalCaige').innerHTML = formatRewardCurrencies(totalCaige);
+            document.getElementById('totalReward').innerHTML = formatRewardCurrencies(totalFeeReturn + totalCashCoupon + totalStockReward + totalCaige);
+        }
+
+        // 清空表单
+        function clearForm() {
+            document.getElementById('broker').value = '';
+            document.getElementById('feeReturn').value = '';
+            document.getElementById('feeReturnCurrency').value = 'CNY';
+            document.getElementById('cashCoupon').value = '';
+            document.getElementById('cashCouponCurrency').value = 'USD';
+            document.getElementById('stockReward').value = '';
+            document.getElementById('stockRewardCurrency').value = 'USD';
+            document.getElementById('caige').value = '';
+            document.getElementById('caigeCurrency').value = 'CNY';
+            document.getElementById('openTime').value = '';
+            document.getElementById('receiveTime').value = '';
+            if (document.getElementById('actualValue')) document.getElementById('actualValue').value = '';
+            if (document.getElementById('actualValueCurrency')) document.getElementById('actualValueCurrency').value = 'CNY';
+            if (document.getElementById('expireTime')) document.getElementById('expireTime').value = '';
+            if (document.getElementById('note')) document.getElementById('note').value = '';
+            document.getElementById('status').value = 'pending';
+            editingId = null;
+            document.getElementById('addBtn').textContent = '➕ 添加奖励记录';
+        }
+
+        // 保存数据
+        function saveData() {
+            localStorage.setItem('accountRewards_v4', JSON.stringify({ accounts, exchangeRates, timestamp: new Date().toISOString() }));
+            if (window.sayiAutoFileBackup) window.sayiAutoFileBackup.schedule('account_rewards_save');
+        }
+
+        // 加载数据
+        function loadData() {
+            const saved = localStorage.getItem('accountRewards_v4');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    
+                    // 处理两种数据格式
+                    // 格式1: { accounts: [...], exchangeRates: {...} }
+                    // 格式2: 直接是 accounts 数组（从主页导入的格式）
+                    if (data.accounts && Array.isArray(data.accounts)) {
+                        accounts = data.accounts;
+                        if (data.exchangeRates) {
+                            exchangeRates = data.exchangeRates;
+                            document.getElementById('rateUSD').value = exchangeRates.USD.toFixed(4);
+                            document.getElementById('rateHKD').value = exchangeRates.HKD.toFixed(4);
+                        }
+                    } else if (Array.isArray(data)) {
+                        // 如果是直接数组格式
+                        accounts = data;
+                    } else {
+                        // 其他格式，尝试查找 accounts 属性
+                        accounts = data.accounts || data || [];
+                    }
+                    
+                    console.log('加载到', accounts.length, '条开户奖励记录');
+                    accounts = accounts.map(normalizeAccount);
+                    updateTable();
+                    updateStats();
+                } catch(e) {
+                    console.error('加载数据失败:', e);
+                    accounts = [];
+                }
+            }
+        }
+        
+        // 强制刷新数据（用于导入后）
+        function reloadData() {
+            console.log('强制刷新开户奖励数据...');
+            loadData();
+            alert('✓ 数据已刷新，共 ' + accounts.length + ' 条记录');
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            fetchExchangeRates(); // 读取长桥；不可用时明确显示状态
+        });
+    </script>
+</body>
+</html>

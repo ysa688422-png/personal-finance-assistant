@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#ff6b9d">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>洒一港股打新 - 二次元投资作战室</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../site-auto-backup.js"></script>
+    <script src="./auto-backup.js"></script>
+    <link rel="stylesheet" href="../music-player.css?v=20260824b">
+    <script defer src="../music-player.js?v=20260824b" data-page="ipo"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #ff6b9d;
+            --secondary: #c44569;
+            --accent: #f8b500;
+            --dark: #1a1a2e;
+            --darker: #16213e;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --chainsaw-red: #ff2d55;
+            --mygo-cyan: #00d9ff;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+        
+        .back-link {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.9em;
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-50%) scale(1.05);
+        }
+        
+        .header h1 {
+            color: #fff;
+            font-size: 2.5em;
+            text-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 20px;
+        }
+        
+        .form-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+        
+        .form-section h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .form-group {
+            margin-bottom: 12px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 0.9em;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .hidden-field {
+            display: none !important;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #ff6b9d, #c44569);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 107, 157, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-info {
+            background: #17a2b8;
+            width: auto;
+            padding: 5px 10px;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #888;
+            font-size: 0.9em;
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .chart-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+        
+        .chart-card h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            text-align: center;
+        }
+        
+        .table-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+        
+        .table-section h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .positive { color: var(--success); font-weight: bold; }
+        .negative { color: var(--danger); font-weight: bold; }
+        
+        .btn-edit {
+            background: #ffc107;
+            color: #333;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+        
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .hk-summary {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .hk-summary h4 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .hk-summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        /* 弹窗样式 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .modal p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        
+        .modal .btn {
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        /* 装饰元素 */
+        .anime-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.08;
+        }
+        
+        /* 装饰图片样式 */
+        .deco-img {
+            position: fixed;
+            z-index: 1;
+            pointer-events: none;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            opacity: 0.8;
+        }
+        
+        .deco-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .deco-img-4 {
+            top: 20%;
+            left: 2%;
+            width: 130px;
+            height: 130px;
+            animation: floatDeco4 5s ease-in-out infinite;
+        }
+        
+        @keyframes floatDeco4 {
+            0%, 100% { transform: translateY(0) rotate(3deg); }
+            50% { transform: translateY(-15px) rotate(-3deg); }
+        }
+    
+
+/* ===== 手机端/数据安全补丁：自动生成，不影响原有数据 ===== */
+@media (max-width: 768px) {
+  body { padding: 10px; }
+  .main-content, .main-grid, .tools-grid, .charts-grid, .stats-grid, .stats-section, .assets-multi-currency { grid-template-columns: 1fr !important; }
+  .left-column, .right-column, .form-section, .list-section, .card, .table-section, .chart-card, .stat-card { width: 100%; padding: 14px; border-radius: 12px; }
+  .header { padding: 16px 12px; margin-bottom: 16px; }
+  .header h1 { font-size: 1.6rem !important; }
+  .header::before, .header::after, .anime-character, .floating-symbol, .music-note, .chainsaw-icon, .deco-img, .pilot-cat, .street-style, .pochita, .tomori { display: none !important; }
+  .back-link { position: static !important; display: inline-block; transform: none !important; margin-bottom: 10px; }
+  .flex-row, .form-row, .currency-row { flex-direction: column; align-items: stretch; }
+  input, select, button { min-height: 44px; font-size: 16px !important; }
+  .chart-container { height: 240px; }
+  table thead { display: none; }
+  table, tbody, tr, td { display: block; width: 100%; }
+  tr { margin-bottom: 12px; padding: 12px; border-radius: 12px; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+  td { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid #eee; text-align: right; word-break: break-word; }
+  td::before { content: attr(data-label); font-weight: 600; color: #666; text-align: left; flex: 0 0 42%; }
+  td.empty-state { display: block; text-align: center; }
+  td.empty-state::before { content: ''; }
+}
+
+</style>
+    <link rel="stylesheet" href="../sayi-anime-theme.css?v=20260621-cream2">
+    <script src="./longbridge-rates.js"></script>
+</head>
+<body>
+<nav data-public-navigation style="padding:10px 20px;background:#f7f1e9;color:#413831;font:14px sans-serif;position:relative;z-index:10"><a href="./index.html">投资工具箱</a> · <a href="./长桥数据.html">长桥数据</a> · <a href="../index.html">个人财务与投资</a></nav>
+    <div class="anime-bg"></div>
+    
+    <!-- 装饰图片4 - 街头时尚 -->
+    <div class="deco-img deco-img-4">
+        <img src="../品牌资产/角色立绘/桃绘.png" alt="街头时尚">
+    </div>
+    
+    <!-- 弹窗 -->
+    <div class="modal-overlay" id="mechanismModal">
+        <div class="modal">
+            <h3>📋 回拨机制说明</h3>
+            <p><strong>机制A：</strong>初始5%，超购逐级回拨最高35%</p>
+            <p><strong>机制B：</strong>固定比例永不回拨</p>
+            <p><strong>18A：</strong>初始10%最高回拨30%</p>
+            <p><strong>18C：</strong>初始5%最高回拨20%</p>
+            <button class="btn" onclick="closeModal()">关闭</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="back-link">← 返回工具箱</a>
+            <h1>🎯 洒一港股打新</h1>
+            <p style="color: #888;">洒一二次元投资作战室</p>
+        </div>
+
+        <div class="exchange-rate" style="background: rgba(255,255,255,0.1); padding: 10px 15px; border-radius: 8px; color: #fff; font-size: 0.9em; margin-bottom: 20px; display: flex; gap: 14px; justify-content: center; align-items: center; flex-wrap: wrap;">
+            <span>汇率（长桥 API / 手工输入）：</span>
+            <span>1 HKD = ¥<span id="rateHKD">0.9200</span></span>
+            <button class="btn" style="width: auto; padding: 5px 15px; margin: 0;" onclick="fetchExchangeRates()">刷新长桥汇率</button> <button type="button" class="btn" style="width:auto" onclick="editManualExchangeRates()">设置手工汇率</button>
+            <span id="rateTime" style="font-size: 0.8em; color: #ddd;"></span>
+        </div>
+        
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalSubscriptions">0</div>
+                <div class="stat-label">总申购次数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalWin">0</div>
+                <div class="stat-label">中签次数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalFee">0</div>
+                <div class="stat-label">总手续费(HKD)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalProfitCNY">0</div>
+                <div class="stat-label">总盈亏(CNY)</div>
+            </div>
+        </div>
+        
+        <!-- 图表区域 -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>📊 券商分布</h3>
+                <canvas id="brokerChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>📈 卖出日分布</h3>
+                <canvas id="sellDayChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <!-- 左侧表单 -->
+            <div class="form-section">
+                <h2>📝 记录打新</h2>
+                
+                <div class="form-group">
+                    <label>股票代码</label>
+                    <input type="text" id="stockCode" placeholder="例如: 00700">
+                </div>
+                
+                <div class="form-group">
+                    <label>板块</label>
+                    <input type="text" id="sector" placeholder="例如: 科技/医药/消费">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>券商</label>
+                        <input type="text" id="broker" placeholder="输入券商名称">
+                    </div>
+                    <div class="form-group">
+                        <label>回拨机制 <button class="btn-info" onclick="showModal()">?</button></label>
+                        <select id="mechanism">
+                            <option value="">选择机制</option>
+                            <option value="A">机制A</option>
+                            <option value="B">机制B</option>
+                            <option value="18A">18A</option>
+                            <option value="18C">18C</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>是否中签</label>
+                    <select id="isWin" onchange="toggleWinFields()">
+                        <option value="pending">待公布</option>
+                        <option value="yes">已中签</option>
+                        <option value="no">未中签</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>打新手续费 (HKD)</label>
+                    <input type="number" id="subscriptionFee" placeholder="输入手续费" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label>是否实际扣手续费</label>
+                    <select id="feeCharged">
+                        <option value="yes">已扣</option>
+                        <option value="no">未扣</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>申购/占用金额 (HKD，可选)</label>
+                    <input type="number" id="applyAmount" placeholder="占用资金" step="0.01">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>申购手数（可选）</label>
+                        <input type="number" id="applyLots" placeholder="如: 10" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label>中签手数（可选）</label>
+                        <input type="number" id="allocatedLots" placeholder="如: 1" step="1">
+                    </div>
+                </div>
+                
+                <!-- 中签相关字段 - 默认隐藏 -->
+                <div id="winFields" class="hidden-field">
+                    <div class="form-group">
+                        <label>中签金额 (HKD)</label>
+                        <input type="number" id="winAmount" placeholder="输入中签金额" step="0.01">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>盈亏金额 (HKD)</label>
+                        <input type="number" id="profitAmount" placeholder="盈利填正数，亏损填负数" step="0.01">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>卖出日</label>
+                        <select id="sellDay">
+                            <option value="">选择卖出时机</option>
+                            <option value="暗盘">暗盘</option>
+                            <option value="首日">首日</option>
+                            <option value="首日后">首日后</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>中签/卖出时间</label>
+                        <input type="date" id="winDate">
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="addRecord()" id="addBtn">➕ 添加记录</button>
+                <button class="btn btn-secondary" style="margin-top: 10px;" onclick="clearForm()">🗑️ 清空</button>
+            </div>
+            
+            <!-- 右侧表格 -->
+            <div class="table-section">
+                <h2>📊 打新记录</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>股票代码</th>
+                            <th>板块</th>
+                            <th>券商</th>
+                            <th>机制</th>
+                            <th>状态</th>
+                            <th>手续费</th>
+                            <th>实际扣费</th>
+                            <th>占用金额</th>
+                            <th>中签金额</th>
+                            <th>盈亏</th>
+                            <th>卖出日</th>
+                            <th>时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordTable"></tbody>
+                </table>
+                
+                <!-- 港币盈亏汇总 -->
+                <div class="hk-summary">
+                    <h4>💰 港币盈亏汇总</h4>
+                    <div class="hk-summary-item">
+                        <span>总中签金额:</span>
+                        <span id="totalWinAmountHKD">HK$0.00</span>
+                    </div>
+                    <div class="hk-summary-item">
+                        <span>总盈亏:</span>
+                        <span id="totalProfitHKD">HK$0.00</span>
+                    </div>
+                    <div class="hk-summary-item">
+                        <span>总手续费:</span>
+                        <span id="totalFeeHKD">HK$0.00</span>
+                    </div>
+                    <div class="hk-summary-item">
+                        <span>净盈亏:</span>
+                        <span id="netProfitHKD">HK$0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 数据存储
+        let records = [];
+        let editingId = null;
+        function createSafeNumericId() { return Date.now() + Math.floor(Math.random() * 1000) / 1000; }
+        function activeRecords() { return records.filter(r => !r.deleted); }
+        function normalizeRecord(record) {
+            return {
+                ...record,
+                id: record.id || createSafeNumericId(),
+                subscriptionFee: Number(record.subscriptionFee || 0),
+                winAmount: Number(record.winAmount || 0),
+                profitAmount: Number(record.profitAmount || 0),
+                applyAmount: Number(record.applyAmount || 0),
+                applyLots: Number(record.applyLots || 0),
+                allocatedLots: Number(record.allocatedLots || 0),
+                feeCharged: record.feeCharged || 'yes',
+                deleted: Boolean(record.deleted),
+                deletedAt: record.deletedAt || ''
+            };
+        }
+        function createLocalSafetyBackup(reason) {
+            try {
+                const key = 'sayi_hkipo_local_backups_v1';
+                const backups = JSON.parse(localStorage.getItem(key) || '[]');
+                backups.unshift({ reason, time: new Date().toISOString(), data: localStorage.getItem('hkIpoRecords_v2') });
+                localStorage.setItem(key, JSON.stringify(backups.slice(0, 20)));
+            } catch(e) { console.warn('港股打新本地备份失败', e); }
+        }
+        let brokerChart = null;
+        let sellDayChart = null;
+        
+        // 汇率：与股票页/开户奖励页共用同一份缓存
+        let exchangeRates = { USD: 1, HKD: 1 }; // 演示占位值，必须自行维护或读取长桥汇率
+        const GLOBAL_FX_KEY = 'sayi_exchange_rates_v2';
+
+        function readSavedExchangeRates() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(GLOBAL_FX_KEY) || 'null');
+                if (saved && Number(saved.HKD) > 0) {
+                    exchangeRates.USD = Number(saved.USD || exchangeRates.USD);
+                    exchangeRates.HKD = Number(saved.HKD);
+                    updateExchangeRateDisplay(saved.updatedAt, saved.source || '本地缓存');
+                } else {
+                    updateExchangeRateDisplay(null, '默认值');
+                }
+            } catch(e) {
+                console.warn('读取本地汇率缓存失败', e);
+                updateExchangeRateDisplay(null, '默认值');
+            }
+        }
+
+        function saveExchangeRatesToCache(source) {
+            localStorage.setItem(GLOBAL_FX_KEY, JSON.stringify({
+                USD: exchangeRates.USD,
+                HKD: exchangeRates.HKD,
+                source,
+                updatedAt: new Date().toISOString()
+            }));
+        }
+
+        function updateExchangeRateDisplay(updatedAt, source) {
+            const rateEl = document.getElementById('rateHKD');
+            const timeEl = document.getElementById('rateTime');
+            if (rateEl) rateEl.textContent = Number(exchangeRates.HKD).toFixed(4);
+            if (timeEl) {
+                const timeText = updatedAt ? new Date(updatedAt).toLocaleString('zh-CN') : '未确认';
+                timeEl.textContent = `更新时间: ${timeText}${source ? '｜来源: ' + source : ''}`;
+            }
+        }
+
+
+        function showExchangeRateFailureAlert(error) {
+            const msg = error && error.message ? error.message : '未知错误';
+            alert('汇率更新失败，请进一步修复。\n\n当前已继续使用本地缓存/旧汇率，不会影响你现有数据。\n\n错误信息：' + msg);
+        }
+
+        function withFreshUrl(url) {
+            const separator = url.includes('?') ? '&' : '?';
+            return url + separator + '_t=' + Date.now();
+        }
+
+        async function fetchJsonWithTimeout(url, timeoutMs = 8000) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                const response = await fetch(withFreshUrl(url), {
+                    cache: 'no-store',
+                    signal: controller.signal,
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!response.ok) throw new Error('HTTP ' + response.status + '：' + url);
+                return await response.json();
+            } finally {
+                clearTimeout(timer);
+            }
+        }
+
+        function applyFetchedRates(usdPerCny, hkdPerCny, source) {
+            if (!(Number(hkdPerCny) > 0)) throw new Error(source + ' 返回的 HKD 汇率字段无效');
+            if (Number(usdPerCny) > 0) exchangeRates.USD = 1 / Number(usdPerCny);
+            exchangeRates.HKD = 1 / Number(hkdPerCny);
+            saveExchangeRatesToCache(source);
+            updateExchangeRateDisplay(new Date().toISOString(), source);
+        }
+
+
+
+
+
+
+        async function fetchExchangeRates() {
+            const status = document.getElementById('rateUpdateTime') || document.getElementById('rateTime');
+            if (status) status.textContent = '正在读取长桥汇率...';
+            try {
+                const values = await window.sayiLongbridgeRates.read();
+                exchangeRates.USD = values.USD;
+                exchangeRates.HKD = values.HKD;
+                localStorage.setItem(GLOBAL_FX_KEY, JSON.stringify({ USD: values.USD, HKD: values.HKD, source: values.source, updatedAt: values.queriedAt }));
+                updateExchangeRateDisplay(values.queriedAt, values.source);
+                updateTable(); updateStats();
+            } catch (error) {
+                readSavedExchangeRates();
+                updateExchangeRateDisplay(null, '长桥暂不可用；现有值是手工值/缓存/演示值，不能视为实时汇率');
+                if (status) status.textContent += '｜' + (error.name === 'AbortError' ? '请求超时' : error.message);
+            }
+        }
+
+        function editManualExchangeRates() {
+            const usd = prompt('手工汇率：1 USD = 多少 CNY？此值不会标记为实时行情。', String(exchangeRates.USD));
+            if (usd === null) return;
+            const hkd = prompt('手工汇率：1 HKD = 多少 CNY？', String(exchangeRates.HKD));
+            if (hkd === null) return;
+            if (!(Number(usd) > 0 && Number(hkd) > 0) || !Number.isFinite(Number(usd)) || !Number.isFinite(Number(hkd))) { alert('请输入有效的正数。'); return; }
+            exchangeRates.USD = Number(usd);
+            exchangeRates.HKD = Number(hkd);
+            saveExchangeRatesToCache('用户手工输入');
+            updateExchangeRateDisplay(new Date().toISOString(), '用户手工输入');
+            updateTable(); updateStats();
+        }
+        
+        // 切换中签字段显示
+        function toggleWinFields() {
+            const isWin = document.getElementById('isWin').value;
+            const winFields = document.getElementById('winFields');
+            
+            if (isWin === 'yes') {
+                winFields.classList.remove('hidden-field');
+            } else {
+                winFields.classList.add('hidden-field');
+            }
+        }
+        
+        // 显示弹窗
+        function showModal() {
+            document.getElementById('mechanismModal').classList.add('active');
+        }
+        
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('mechanismModal').classList.remove('active');
+        }
+        
+        // 添加/编辑记录
+        function addRecord() {
+            const stockCode = document.getElementById('stockCode').value.trim();
+            const sector = document.getElementById('sector').value.trim();
+            const broker = document.getElementById('broker').value.trim();
+            const mechanism = document.getElementById('mechanism').value;
+            const isWin = document.getElementById('isWin').value;
+            const subscriptionFee = parseFloat(document.getElementById('subscriptionFee').value) || 0;
+            const feeCharged = document.getElementById('feeCharged')?.value || 'yes';
+            const applyAmount = parseFloat(document.getElementById('applyAmount')?.value) || 0;
+            const applyLots = parseInt(document.getElementById('applyLots')?.value) || 0;
+            const allocatedLots = parseInt(document.getElementById('allocatedLots')?.value) || 0;
+            
+            let winAmount = 0;
+            let profitAmount = 0;
+            let sellDay = '';
+            let winDate = '';
+            
+            if (isWin === 'yes') {
+                winAmount = parseFloat(document.getElementById('winAmount').value) || 0;
+                profitAmount = parseFloat(document.getElementById('profitAmount').value) || 0;
+                sellDay = document.getElementById('sellDay').value;
+                winDate = document.getElementById('winDate').value;
+            }
+            
+            if (!stockCode || !broker) {
+                alert('请填写股票代码和券商');
+                return;
+            }
+            
+            if (editingId) {
+                // 编辑模式
+                const index = records.findIndex(r => r.id === editingId);
+                if (index !== -1) {
+                    records[index] = {
+                        id: editingId,
+                        stockCode, sector, broker, mechanism, isWin,
+                        subscriptionFee, feeCharged, applyAmount, applyLots, allocatedLots,
+                        winAmount, profitAmount, sellDay, winDate
+                    };
+                }
+                editingId = null;
+                document.getElementById('addBtn').textContent = '➕ 添加记录';
+            } else {
+                // 添加模式
+                records.push({
+                    id: createSafeNumericId(),
+                    stockCode, sector, broker, mechanism, isWin,
+                    subscriptionFee, feeCharged, applyAmount, applyLots, allocatedLots,
+                    winAmount, profitAmount, sellDay, winDate
+                });
+            }
+            
+            updateTable();
+            updateStats();
+            updateCharts();
+            clearForm();
+            saveData();
+        }
+        
+        // 更新表格
+        function updateTable() {
+            const tbody = document.getElementById('recordTable');
+            tbody.innerHTML = '';
+            
+            // 按时间倒序排列
+            const sortedRecords = [...activeRecords()].sort((a, b) => {
+                if (!a.winDate) return 1;
+                if (!b.winDate) return -1;
+                return new Date(b.winDate) - new Date(a.winDate);
+            });
+            
+            sortedRecords.forEach(record => {
+                const profitClass = record.profitAmount >= 0 ? 'positive' : 'negative';
+                const profitSign = record.profitAmount >= 0 ? '+' : '';
+                
+                // 根据状态显示不同内容
+                let statusText = '待公布';
+                let statusClass = 'status-pending';
+                if (record.isWin === 'yes') {
+                    statusText = '已中签';
+                    statusClass = 'status-win';
+                } else if (record.isWin === 'no') {
+                    statusText = '未中签';
+                    statusClass = 'status-lose';
+                }
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td data-label="股票代码">${record.stockCode}</td>
+                    <td data-label="板块">${record.sector || '-'}</td>
+                    <td data-label="券商">${record.broker}</td>
+                    <td data-label="机制">${record.mechanism || '-'}</td>
+                    <td>${statusText}</td>
+                    <td data-label="手续费">HK$${record.subscriptionFee.toFixed(2)}</td>
+                    <td data-label="实际扣费">${record.feeCharged === 'no' ? '未扣' : '已扣'}</td>
+                    <td data-label="占用金额">${record.applyAmount ? 'HK$' + Number(record.applyAmount).toFixed(2) : '-'}</td>
+                    <td data-label="中签金额">${record.isWin === 'yes' ? 'HK$' + record.winAmount.toFixed(2) : '-'}</td>
+                    <td class="${record.isWin === 'yes' ? profitClass : ''}">${record.isWin === 'yes' ? profitSign + 'HK$' + record.profitAmount.toFixed(2) : '-'}</td>
+                    <td data-label="卖出日">${record.sellDay || '-'}</td>
+                    <td data-label="时间">${record.winDate || '-'}</td>
+                    <td data-label="操作">
+                        <button class="btn-edit" onclick="editRecord(${record.id})">编辑</button>
+                        <button class="btn-delete" onclick="deleteRecord(${record.id})">删除</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // 更新统计
+        function updateStats() {
+            const totalSubscriptions = activeRecords().length;
+            const totalWin = activeRecords().filter(r => r.isWin === 'yes').length;
+            const totalFee = activeRecords().reduce((sum, r) => sum + (r.feeCharged === 'no' ? 0 : r.subscriptionFee), 0);
+            
+            // 计算港币盈亏
+            const totalWinAmountHKD = activeRecords().filter(r => r.isWin === 'yes').reduce((sum, r) => sum + r.winAmount, 0);
+            const totalProfitHKD = activeRecords().filter(r => r.isWin === 'yes').reduce((sum, r) => sum + r.profitAmount, 0);
+            const netProfitHKD = totalProfitHKD - totalFee;
+            
+            // 转换为人民币：使用扣除实际手续费后的净盈亏
+            const totalProfitCNY = netProfitHKD * exchangeRates.HKD;
+            
+            // 更新统计卡片
+            document.getElementById('totalSubscriptions').textContent = totalSubscriptions;
+            document.getElementById('totalWin').textContent = totalWin;
+            document.getElementById('totalFee').textContent = 'HK$' + totalFee.toFixed(2);
+            
+            const profitEl = document.getElementById('totalProfitCNY');
+            profitEl.textContent = (totalProfitCNY >= 0 ? '+' : '') + '¥' + totalProfitCNY.toFixed(2);
+            profitEl.style.color = totalProfitCNY >= 0 ? '#28a745' : '#dc3545';
+            
+            // 更新港币汇总
+            document.getElementById('totalWinAmountHKD').textContent = 'HK$' + totalWinAmountHKD.toFixed(2);
+            document.getElementById('totalProfitHKD').textContent = 'HK$' + totalProfitHKD.toFixed(2);
+            document.getElementById('totalFeeHKD').textContent = 'HK$' + totalFee.toFixed(2);
+            
+            const netEl = document.getElementById('netProfitHKD');
+            netEl.textContent = 'HK$' + netProfitHKD.toFixed(2);
+            netEl.style.color = netProfitHKD >= 0 ? '#28a745' : '#dc3545';
+        }
+        
+        // 更新图表
+        function updateCharts() {
+            // 券商分布
+            const brokerCounts = {};
+            activeRecords().filter(r => r.isWin === 'yes').forEach(r => {
+                brokerCounts[r.broker] = (brokerCounts[r.broker] || 0) + 1;
+            });
+            
+            // 卖出日分布
+            const sellDayCounts = {};
+            activeRecords().filter(r => r.isWin === 'yes' && r.sellDay).forEach(r => {
+                sellDayCounts[r.sellDay] = (sellDayCounts[r.sellDay] || 0) + 1;
+            });
+            
+            // 销毁旧图表
+            if (brokerChart) brokerChart.destroy();
+            if (sellDayChart) sellDayChart.destroy();
+            
+            // 创建券商分布图
+            const brokerCtx = document.getElementById('brokerChart').getContext('2d');
+            brokerChart = new Chart(brokerCtx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(brokerCounts),
+                    datasets: [{
+                        data: Object.values(brokerCounts),
+                        backgroundColor: ['#ff6b9d', '#00d9ff', '#ffc107', '#28a745', '#dc3545', '#9b59b6', '#e74c3c', '#2ecc71']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'right' }
+                    }
+                }
+            });
+            
+            // 创建卖出日分布图
+            const sellDayCtx = document.getElementById('sellDayChart').getContext('2d');
+            sellDayChart = new Chart(sellDayCtx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(sellDayCounts),
+                    datasets: [{
+                        data: Object.values(sellDayCounts),
+                        backgroundColor: ['#ff6b9d', '#00d9ff', '#ffc107', '#28a745']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'right' }
+                    }
+                }
+            });
+        }
+        
+        // 编辑记录
+        function editRecord(id) {
+            const record = records.find(r => r.id === id);
+            if (!record) return;
+            
+            editingId = id;
+            document.getElementById('stockCode').value = record.stockCode;
+            document.getElementById('sector').value = record.sector || '';
+            document.getElementById('broker').value = record.broker;
+            document.getElementById('mechanism').value = record.mechanism || '';
+            document.getElementById('isWin').value = record.isWin;
+            document.getElementById('subscriptionFee').value = record.subscriptionFee;
+            if (document.getElementById('feeCharged')) document.getElementById('feeCharged').value = record.feeCharged || 'yes';
+            if (document.getElementById('applyAmount')) document.getElementById('applyAmount').value = record.applyAmount || '';
+            if (document.getElementById('applyLots')) document.getElementById('applyLots').value = record.applyLots || '';
+            if (document.getElementById('allocatedLots')) document.getElementById('allocatedLots').value = record.allocatedLots || '';
+            
+            // 切换中签字段显示
+            toggleWinFields();
+            
+            if (record.isWin === 'yes') {
+                document.getElementById('winAmount').value = record.winAmount;
+                document.getElementById('profitAmount').value = record.profitAmount;
+                document.getElementById('sellDay').value = record.sellDay || '';
+                document.getElementById('winDate').value = record.winDate || '';
+            }
+            
+            document.getElementById('addBtn').textContent = '💾 保存修改';
+        }
+        
+        // 删除记录
+        function deleteRecord(id) {
+            if (confirm('确定要删除这条记录吗？\n\n这次不会真正删除，会放入本地回收标记。')) {
+                createLocalSafetyBackup('before_soft_delete_hkipo');
+                const record = records.find(r => r.id === id);
+                if (record) {
+                    record.deleted = true;
+                    record.deletedAt = new Date().toISOString();
+                }
+                if (editingId === id) clearForm();
+                updateTable();
+                updateStats();
+                updateCharts();
+                saveData();
+            }
+        }
+        
+        // 清空表单
+        function clearForm() {
+            document.getElementById('stockCode').value = '';
+            document.getElementById('sector').value = '';
+            document.getElementById('broker').value = '';
+            document.getElementById('mechanism').value = '';
+            document.getElementById('isWin').value = 'pending';
+            document.getElementById('subscriptionFee').value = '';
+            if (document.getElementById('feeCharged')) document.getElementById('feeCharged').value = 'yes';
+            if (document.getElementById('applyAmount')) document.getElementById('applyAmount').value = '';
+            if (document.getElementById('applyLots')) document.getElementById('applyLots').value = '';
+            if (document.getElementById('allocatedLots')) document.getElementById('allocatedLots').value = '';
+            document.getElementById('winAmount').value = '';
+            document.getElementById('profitAmount').value = '';
+            document.getElementById('sellDay').value = '';
+            document.getElementById('winDate').value = '';
+            document.getElementById('winFields').classList.add('hidden-field');
+            editingId = null;
+            document.getElementById('addBtn').textContent = '➕ 添加记录';
+        }
+        
+        // 保存数据
+        function saveData() {
+            const data = {
+                records: records,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('hkIpoRecords_v2', JSON.stringify(data));
+            if (window.sayiAutoFileBackup) window.sayiAutoFileBackup.schedule('hk_ipo_save');
+        }
+        
+        // 加载数据
+        function loadData() {
+            const saved = localStorage.getItem('hkIpoRecords_v2');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    createLocalSafetyBackup('before_hkipo_migration');
+                    records = (data.records || (Array.isArray(data) ? data : [])).map(normalizeRecord);
+                    saveData();
+                } catch(e) {
+                    console.error('港股打新数据读取失败，原始数据已保留:', e);
+                    alert('港股打新数据读取失败，原始 localStorage 数据没有被删除。请先从主页导出备份。');
+                    records = [];
+                }
+            }
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            readSavedExchangeRates();
+            updateTable();
+            updateStats();
+            updateCharts();
+            fetchExchangeRates(); // 读取长桥；不可用时明确显示状态
+        });
+    </script>
+</body>
+</html>

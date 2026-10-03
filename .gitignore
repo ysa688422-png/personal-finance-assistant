@@ -1,0 +1,39 @@
+# Credentials and local identity
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.csr
+*.p12
+*.pfx
+.mobile-ledger-pairing-token
+手机记账/https-cert/
+# Private financial records, local AI history and backups
+数据备份/
+运行日志/
+outputs/
+财务管理/手机记账同步/
+个人财务助理/index/
+个人财务助理/audit/
+个人财务助理/changes/
+个人财务助理/backups/
+*.sqlite*
+*.db
+*.jsonl
+*.log
+*-全部同步.json
+*-导入财务管理.json
+*-同步数据.json
+latest-browser-data.json
+# Build and local environment
+.DS_Store
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+node_modules/
+*.app/
+build/
+dist/
+音乐/

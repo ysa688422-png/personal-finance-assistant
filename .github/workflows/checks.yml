@@ -1,0 +1,28 @@
+name: Source checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned Longbridge SDK for schema tests
+        run: python -m pip install -r requirements-longbridge.txt
+      - name: Read gateway and receiver tests without account credentials
+        run: |
+          python -m unittest discover -s tests -p 'test_*.py'
+          python 手机记账/test_sync_server_security.py
+      - name: Currency conversion and ledger regression tests
+        run: |
+          node tests/longbridge-rates.test.js
+          node 手机记账/voice-ledger/report-periods.test.js
+          node 手机记账/voice-ledger/voice-entry.test.js
+          node 手机记账/voice-ledger/service-worker.test.js
+          node 手机记账/voice-ledger/detail-voice-search.test.js

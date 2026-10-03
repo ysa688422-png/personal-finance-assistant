@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleDevelopmentRegion</key>
+  <string>zh_CN</string>
+  <key>CFBundleDisplayName</key>
+  <string>洒一财务助理</string>
+  <key>CFBundleExecutable</key>
+  <string>SayiFinanceAssistant</string>
+  <key>CFBundleIconFile</key>
+  <string>SayiFinance</string>
+  <key>CFBundleIdentifier</key>
+  <string>com.sayi.financeassistant.desktop</string>
+  <key>CFBundleInfoDictionaryVersion</key>
+  <string>6.0</string>
+  <key>CFBundleName</key>
+  <string>洒一财务助理</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>CFBundleShortVersionString</key>
+  <string>1.0</string>
+  <key>CFBundleVersion</key>
+  <string>1</string>
+  <key>CFBundleURLTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleURLName</key>
+      <string>com.sayi.financeassistant.desktop</string>
+      <key>CFBundleURLSchemes</key>
+      <array><string>sayi-finance-assistant</string></array>
+    </dict>
+  </array>
+  <key>LSMinimumSystemVersion</key>
+  <string>13.0</string>
+  <key>NSAppTransportSecurity</key>
+  <dict><key>NSAllowsLocalNetworking</key><true/></dict>
+  <key>NSDocumentsFolderUsageDescription</key>
+  <string>需要读取“文稿/财务与投资”中的账本，并在其中保存本机索引和对话历史。请允许访问“文稿”文件夹。</string>
+  <key>NSHighResolutionCapable</key>
+  <true/>
+</dict>
+</plist>

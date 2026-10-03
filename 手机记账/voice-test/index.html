@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffdc42" />
+    <title>手机记账 · 语音测试版</title>
+    <link rel="stylesheet" href="./styles.css?v=3" />
+  </head>
+  <body>
+    <main class="voice-app">
+      <header class="app-header">
+        <a class="back-link" href="../index.html" aria-label="返回手机记账">←</a>
+        <div>
+          <p>VOICE BETA · 电脑测试</p>
+          <h1>语音记账</h1>
+        </div>
+        <span class="beta-badge">测试版</span>
+      </header>
+
+      <section class="summary-band" aria-label="支出汇总">
+        <div class="summary-intro">
+          <span id="summaryDate">2026年8月</span>
+          <strong>我的账本</strong>
+          <button id="voiceShortcut" class="voice-shortcut" type="button"><span class="mini-mic" aria-hidden="true"></span>语音记一笔</button>
+        </div>
+        <div class="summary-cell today"><span>今天支出</span><strong id="todayExpense">¥0.00</strong></div>
+        <div class="summary-cell month"><span>本月支出</span><strong id="monthExpense">¥0.00</strong></div>
+        <div class="summary-cell year"><span>今年支出</span><strong id="yearExpense">¥0.00</strong></div>
+        <div class="summary-cell income"><span>本月收入</span><strong id="monthIncome">¥0.00</strong></div>
+      </section>
+
+      <nav class="workspace-tabs" aria-label="账本视图">
+        <button class="workspace-tab active" type="button" data-view="detailsView">明细</button>
+        <button class="workspace-tab" type="button" data-view="chartsView">统计报表</button>
+        <button class="workspace-tab voice-tab" type="button" data-view="voiceView"><span class="mini-mic" aria-hidden="true"></span>语音记账</button>
+      </nav>
+
+      <section id="detailsView" class="dashboard-view active" aria-labelledby="testLedgerTitle">
+        <div class="details-grid">
+          <div class="ledger-column">
+            <div class="panel-heading ledger-heading">
+              <div>
+                <span class="section-kicker">正式同步数据 + 语音测试</span>
+                <h2 id="testLedgerTitle">最近明细</h2>
+              </div>
+              <button id="clearTestButton" class="text-action" type="button">清空语音测试</button>
+            </div>
+            <div id="testRecordList" class="record-list"></div>
+          </div>
+          <aside class="month-category-panel">
+            <span class="section-kicker">本月去向</span>
+            <h2>支出科目</h2>
+            <div id="categorySummary" class="category-summary"></div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="chartsView" class="dashboard-view" aria-labelledby="chartsTitle" hidden>
+        <div class="panel-heading report-heading">
+          <div><span class="section-kicker">统计报表</span><h2 id="chartsTitle">收支趋势与分类</h2></div>
+          <span id="reportRange" class="confidence-badge">最近7天</span>
+        </div>
+        <div class="report-grid">
+          <section class="trend-report">
+            <div class="report-title"><strong>近七天支出</strong><span id="weekExpense">¥0.00</span></div>
+            <div id="trendChart" class="trend-chart"></div>
+          </section>
+          <section class="category-report">
+            <div class="report-title"><strong>本月分类排行</strong><span>按支出金额</span></div>
+            <div id="categoryRanking" class="category-ranking"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="voiceView" class="dashboard-view" hidden>
+        <section class="voice-stage" aria-labelledby="voiceTitle">
+          <div class="stage-copy">
+            <span class="section-kicker">一句话完成一笔账</span>
+            <h2 id="voiceTitle">说出来，剩下的交给我。</h2>
+            <p>例如：“今天餐饮支出三十五块五，午饭。”</p>
+          </div>
+
+          <button id="voiceButton" class="voice-button" type="button" aria-label="开始语音记账">
+            <span class="mic-icon" aria-hidden="true"></span>
+            <strong id="voiceButtonText">开始说话</strong>
+          </button>
+
+          <div class="listening-bars" id="listeningBars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+          <p class="voice-status" id="voiceStatus" role="status">点击麦克风后开始说，停顿时会自动结束。</p>
+          <output class="live-transcript" id="liveTranscript">等待你的第一句话</output>
+
+          <div class="examples" aria-label="语音示例">
+            <button type="button" data-demo="今天早上吃早饭花了五块钱">早饭 5</button>
+            <button type="button" data-demo="今天坐公交花了一块六">公交 1.6</button>
+            <button type="button" data-demo="今天工资收入八千元，八月工资">工资 8000</button>
+          </div>
+        </section>
+
+        <section id="previewPanel" class="preview-panel" aria-labelledby="previewTitle" hidden>
+          <div class="panel-heading">
+            <div><span class="section-kicker">识别结果</span><h2 id="previewTitle">确认这笔记录</h2></div>
+            <span id="confidenceBadge" class="confidence-badge">已识别</span>
+          </div>
+          <div class="receipt-preview">
+            <div class="preview-main"><span id="previewType" class="type-chip expense">支出</span><strong id="previewAmount">¥0.00</strong></div>
+            <dl class="preview-fields">
+              <div><dt>科目</dt><dd id="previewCategory">餐饮</dd></div>
+              <div><dt>日期</dt><dd id="previewDate">今天</dd></div>
+              <div><dt>备注</dt><dd id="previewNote">—</dd></div>
+              <div><dt>原话</dt><dd id="previewTranscript">—</dd></div>
+            </dl>
+          </div>
+          <p id="parseWarning" class="parse-warning" hidden></p>
+          <div class="preview-actions">
+            <button id="retryButton" class="secondary-action" type="button">重新说</button>
+            <button id="saveVoiceButton" class="primary-action" type="button">确认保存</button>
+          </div>
+        </section>
+      </section>
+
+      <footer>
+        <strong>隐私提示</strong>
+        <span>此测试版使用 Chrome 浏览器语音识别，需要联网；测试记录只保存在这台电脑浏览器里，不会同步到正式账本。</span>
+      </footer>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="./app.js?v=3"></script>
+  </body>
+</html>

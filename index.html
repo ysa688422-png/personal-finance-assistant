@@ -1,0 +1,1022 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#16213e" />
+  <title>洒一的财务与投资</title>
+  <link rel="stylesheet" href="./music-player.css?v=20260824b" />
+  <script defer src="./music-player.js?v=20260824b" data-page="home"></script>
+  <style>
+    :root {
+      --bg: #fff6fb;
+      --ink: #2b2335;
+      --muted: #7a6f8e;
+      --line: rgba(255, 133, 183, 0.38);
+      --panel: rgba(255, 255, 255, 0.9);
+      --pink: #ff4f9a;
+      --cyan: #72d7ff;
+      --gold: #ffe07a;
+      --navy: #bda4ff;
+      --shadow: 0 16px 34px rgba(255, 126, 182, 0.22);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Nunito", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      background:
+        radial-gradient(circle at 14% 12%, rgba(255, 224, 122, 0.42) 0 72px, transparent 73px),
+        radial-gradient(circle at 86% 14%, rgba(114, 215, 255, 0.35) 0 92px, transparent 93px),
+        radial-gradient(circle at 68% 84%, rgba(255, 126, 182, 0.26) 0 120px, transparent 121px),
+        linear-gradient(135deg, var(--bg), #edf8ff 54%, #fffaf0);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      background:
+        linear-gradient(90deg, rgba(255, 126, 182, 0.13) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(114, 215, 255, 0.13) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.72), transparent 78%);
+    }
+
+    body::after {
+      content: "☆  ₊˚  ♡  sparkle budget mode  ♡  ₊˚  ☆";
+      position: fixed;
+      right: 18px;
+      bottom: 16px;
+      pointer-events: none;
+      color: rgba(255, 79, 154, 0.26);
+      font-size: 18px;
+      font-weight: 900;
+      transform: rotate(-4deg);
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .shell {
+      width: min(1060px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 36px 0 44px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 240px;
+      align-items: center;
+      gap: 14px;
+      padding: 28px;
+      margin-bottom: 22px;
+      border: 2px solid rgba(255, 255, 255, 0.72);
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 8% 20%, rgba(255, 224, 122, 0.75), transparent 28%),
+        radial-gradient(circle at 92% 14%, rgba(114, 215, 255, 0.58), transparent 30%),
+        linear-gradient(135deg, rgba(255, 126, 182, 0.88), rgba(189, 164, 255, 0.78) 52%, rgba(141, 240, 210, 0.68));
+      box-shadow: 0 22px 52px rgba(255, 126, 182, 0.28);
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      right: -42px;
+      bottom: -52px;
+      width: 180px;
+      height: 180px;
+      border-radius: 48% 52% 44% 56%;
+      background:
+        radial-gradient(circle at 42% 38%, rgba(255, 255, 255, 0.85) 0 12px, transparent 13px),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.32), rgba(255, 224, 122, 0.28));
+      transform: rotate(-18deg);
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: "♡ ☆ ♡";
+      position: absolute;
+      right: 22px;
+      top: 18px;
+      color: rgba(255, 255, 255, 0.76);
+      font-size: 28px;
+      font-weight: 950;
+      transform: rotate(9deg);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      padding: 6px 11px;
+      border: 1px solid rgba(255, 126, 182, 0.36);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.74);
+      color: var(--pink);
+      font-size: 12px;
+      font-weight: 900;
+      box-shadow: 0 6px 18px rgba(255, 126, 182, 0.16);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 7vw, 66px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      max-width: 720px;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 17px;
+      line-height: 1.7;
+      font-weight: 600;
+    }
+
+    .hero-copy { display: grid; gap: 14px; position: relative; z-index: 1; }
+
+    .hero-character {
+      width: 220px;
+      aspect-ratio: 1;
+      justify-self: end;
+      object-fit: cover;
+      object-position: center 12%;
+      border: 2px solid rgba(255, 255, 255, 0.88);
+      border-radius: 8px;
+      box-shadow: 7px 7px 0 rgba(43, 35, 53, 0.18);
+      position: relative;
+      z-index: 1;
+    }
+
+    .companion-stage {
+      margin: 0 0 22px;
+      padding: 22px 0;
+      border-top: 2px solid var(--line);
+      border-bottom: 2px solid var(--line);
+    }
+
+    .companion-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .companion-heading h2 { margin: 0 0 5px; font-size: 28px; }
+    .companion-heading p { margin: 0; color: var(--muted); font-weight: 700; }
+
+    .cast-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 560px);
+      gap: 12px;
+    }
+
+    .cast-member[hidden] { display: none !important; }
+
+    .cast-member {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr);
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.82);
+    }
+
+    .cast-member img {
+      width: 92px;
+      height: 104px;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+
+    .cast-member.jinli img { object-fit: cover; object-position: center 12%; }
+    .cast-member.portrait img { object-fit: cover; object-position: center 18%; }
+    .cast-member h3 { margin: 0 0 4px; font-size: 20px; }
+    .cast-member p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; font-weight: 700; }
+    .cast-role { display: inline-block; margin-top: 7px; color: var(--pink); font-size: 11px; font-weight: 900; }
+
+    .data-panel {
+      display: grid;
+      gap: 12px;
+      padding: 18px;
+      margin-bottom: 22px;
+      border: 2px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 250, 253, 0.88));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .data-panel-header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .data-panel h2 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .data-panel p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-weight: 600;
+    }
+
+    .data-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      display: grid;
+      gap: 16px;
+      padding: 22px;
+      min-height: 310px;
+      border: 2px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 250, 253, 0.88));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 42px rgba(255, 126, 182, 0.25);
+    }
+
+    .card-header {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 58px;
+      height: 58px;
+      border: 2px solid rgba(255, 255, 255, 0.78);
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--gold), #fff2b2);
+      font-size: 30px;
+      box-shadow: 0 6px 0 rgba(43, 35, 53, 0.12);
+      flex: 0 0 auto;
+    }
+
+    .icon.pet-icon { overflow: hidden; background: #fff; }
+    .icon.pet-icon img { width: 100%; height: 100%; object-fit: contain; }
+    .icon.pet-icon.jinli-icon img { object-fit: cover; object-position: center 12%; }
+    .icon.pet-icon.portrait-icon img { object-fit: cover; object-position: center 18%; }
+
+    .card h2 {
+      margin: 0;
+      font-size: clamp(25px, 3vw, 34px);
+      line-height: 1.1;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-weight: 600;
+    }
+
+    .features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .features li {
+      padding: 7px 10px;
+      border: 1px solid rgba(255, 126, 182, 0.36);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.74);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-self: end;
+    }
+
+    .ledger-live {
+      display: grid;
+      gap: 10px;
+      padding: 13px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .ledger-live-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .ledger-live-head strong { font-size: 14px; }
+    .ledger-live-head span { color: var(--muted); font-size: 12px; font-weight: 800; text-align: right; }
+    .ledger-live-head span.online { color: #148c70; }
+    .ledger-live-head span.offline { color: #c53d5a; }
+    .ledger-latest { display: grid; gap: 7px; }
+    .ledger-latest-row { display: grid; grid-template-columns: 76px minmax(0, 1fr) auto; gap: 9px; align-items: center; font-size: 12px; }
+    .ledger-latest-row time { color: var(--muted); }
+    .ledger-latest-row span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 800; }
+    .ledger-latest-row strong { color: var(--pink); font-size: 13px; }
+
+    .primary-link,
+    .ghost-link,
+    .data-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 11px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.54);
+      border-radius: 999px;
+      font-weight: 900;
+    }
+
+    .primary-link,
+    .data-button.primary {
+      background: linear-gradient(135deg, var(--pink), #ff6f3c);
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(255, 79, 154, 0.26);
+    }
+
+    .ghost-link,
+    .data-button {
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--ink);
+    }
+
+    .data-button {
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .data-button:hover,
+    .primary-link:hover,
+    .ghost-link:hover,
+    .quick-row a:hover {
+      transform: translateY(-1px);
+    }
+
+    .quick-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .quick-row a {
+      padding: 14px;
+      border: 1px solid rgba(255, 126, 182, 0.36);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .footer {
+      margin-top: 24px;
+      color: var(--muted);
+      text-align: center;
+      font-weight: 700;
+    }
+
+    @media (max-width: 820px) {
+      .section-grid,
+      .quick-row { grid-template-columns: 1fr; }
+      .shell { width: min(100% - 20px, 1060px); padding-top: 18px; }
+      .hero, .card { padding: 18px; }
+      .hero { grid-template-columns: minmax(0, 1fr) 132px; }
+      .hero-character { width: 126px; }
+      .cast-grid { grid-template-columns: 1fr; }
+      body::after { display: none; }
+    }
+
+    @media (max-width: 520px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-character { width: 150px; justify-self: start; }
+      .companion-heading { align-items: flex-start; }
+      .companion-heading h2 { font-size: 24px; }
+      .cast-member { grid-template-columns: 78px minmax(0, 1fr); }
+      .cast-member img { width: 78px; height: 90px; }
+    }
+
+  </style>
+  <link rel="stylesheet" href="./sayi-anime-theme.css?v=20260621-cream2" />
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">二次元财务作战室</span>
+        <h1>洒一的财务与投资</h1>
+        <p>金璃、紫铃、樱露、桃绘和星澄陪你管理日常记账、流水分析、资产与投资。数据仍然本地优先，角色只负责让认真理财这件事更有生命力。</p>
+      </div>
+      <img id="dutyHero" class="hero-character" src="./品牌资产/sayi-finance-app-icon.png" alt="今日值班伙伴">
+    </section>
+
+    <section class="companion-stage" aria-label="财务伙伴">
+      <div class="companion-heading">
+        <div>
+          <h2 id="dutyPartnerTitle">今日值班伙伴</h2>
+          <p id="dutyScheduleLabel">正在读取今天的轮班安排。</p>
+        </div>
+      </div>
+      <div class="cast-grid">
+        <article class="cast-member jinli" data-character="金璃" hidden>
+          <img src="./品牌资产/角色动图/金璃/waving.gif" alt="金璃挥手">
+          <div><h3>金璃</h3><p>蓝发金币少女，负责全局总览、投资分析与重要提醒。</p><span class="cast-role">主财务助理</span></div>
+        </article>
+        <article class="cast-member" data-character="紫铃" hidden>
+          <img src="./品牌资产/角色动图/紫铃/waving.gif" alt="紫铃挥手">
+          <div><h3>紫铃</h3><p>棕发猫娘伙伴，负责日常记账、现金流与消费提醒。</p><span class="cast-role">现金流助手</span></div>
+        </article>
+        <article class="cast-member" data-character="樱露" hidden>
+          <img src="./品牌资产/角色动图/樱露/waving.gif?v=20260819-character2" alt="樱露挥手">
+          <div><h3>樱露</h3><p>白发异瞳精灵，负责预算、储蓄目标和长期规划。</p><span class="cast-role">储蓄规划助手</span></div>
+        </article>
+        <article class="cast-member portrait" data-character="桃绘" hidden>
+          <img src="./品牌资产/角色动图/桃绘/taohui-duty.gif?v=20260822-gemini" alt="桃绘使用计算器记账">
+          <div><h3>桃绘</h3><p>粉发消费侦探，拿着计算器追踪异常消费和账单变化。</p><span class="cast-role">消费复盘助手</span></div>
+        </article>
+        <article class="cast-member portrait" data-character="星澄" hidden>
+          <img src="./品牌资产/角色动图/星澄/star-expression.gif?v=20260822-3looks" alt="星澄表情动画">
+          <div><h3>星澄</h3><p>银蓝发资产观测员，负责收益趋势、仓位与风险提醒。</p><span class="cast-role">资产风险助手</span></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="data-panel" aria-label="全站数据导入导出">
+      <div class="data-panel-header">
+        <h2>所有数据备份</h2>
+        <div class="data-actions">
+          <button class="data-button primary" type="button" onclick="exportAllSiteData()">导出所有数据</button>
+          <button class="data-button" type="button" onclick="document.getElementById('siteImportFile').click()">导入数据</button>
+          <button class="data-button" type="button" onclick="restoreLatestSiteBackup()">恢复最近本地备份</button>
+          <button id="enableSiteFileBackupBtn" class="data-button primary" type="button" onclick="enableSiteFileBackup()">开启自动备份</button>
+          <button class="data-button" type="button" onclick="saveSiteFileBackupNow()">立即备份</button>
+          <input id="siteImportFile" type="file" accept=".json,application/json" hidden onchange="importAllSiteData(this)">
+        </div>
+      </div>
+      <p id="siteDataStatus">覆盖手机记账、财务管理、流水分析、专项收支、投资工具箱等本地数据。各一级页面自己的导入导出仍然保留。</p>
+      <p id="siteFileBackupStatus">自动文件备份：检查中...</p>
+    </section>
+
+    <section class="section-grid" aria-label="主板块">
+      <article class="card">
+        <div class="card-header">
+          <span class="icon pet-icon"><img src="./品牌资产/角色动图/紫铃/running.gif" alt="紫铃工作中"></span>
+          <h2>手机记账</h2>
+        </div>
+        <p>手动记账与语音记账已经合并，共用同一手机账本、电脑接收器和财务分析数据。</p>
+        <ul class="features">
+          <li>本地保存</li>
+          <li>手机优先</li>
+          <li>自动同步</li>
+          <li>进入财务管理分析</li>
+        </ul>
+        <section class="ledger-live" aria-label="手机记账同步状态">
+          <div class="ledger-live-head"><strong>电脑接收器</strong><span id="mobileLedgerLiveStatus">正在读取...</span></div>
+          <div id="mobileLedgerLatest" class="ledger-latest"><span>正在读取最近记录...</span></div>
+        </section>
+        <div class="actions">
+          <a class="primary-link" href="/voice-ledger-stable/index.html" data-sync-route="/voice-ledger-stable/index.html">进入合并版手机记账</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <span class="icon pet-icon portrait-icon"><img src="./品牌资产/角色动图/桃绘/taohui-receipt.gif?v=20260822-gemini" alt="桃绘展示消费账单"></span>
+          <h2>支出与收入流水</h2>
+        </div>
+        <p>手机记账同步后的流水汇总入口，按周、月、年查看支出分类饼图、最大支出排行和异常变化分析。</p>
+        <ul class="features">
+          <li>周月年分析</li>
+          <li>支出饼图</li>
+          <li>最大支出排行</li>
+          <li>Codex 分析包</li>
+        </ul>
+        <div class="actions">
+          <a class="primary-link" href="/支出与收入流水/index.html" data-sync-route="/支出与收入流水/index.html">进入流水分析</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <span class="icon pet-icon"><img src="./品牌资产/角色动图/樱露/idle.gif?v=20260819-character2" alt="樱露待机"></span>
+          <h2>财务管理</h2>
+        </div>
+        <p>管理资产账户、收入支出和还款清单。本月收入支出来自手机记账，总资产可从股票直仓同步。</p>
+        <ul class="features">
+          <li>资产账户</li>
+          <li>收入支出</li>
+          <li>还款清单</li>
+          <li>自动同步</li>
+        </ul>
+        <div class="actions">
+          <a class="primary-link" href="/财务管理/index.html" data-sync-route="/财务管理/index.html">进入财务管理</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <span class="icon pet-icon portrait-icon"><img src="./品牌资产/角色动图/星澄/star-tablet.gif?v=20260822-3looks" alt="星澄整理专项收支"></span>
+          <h2>特殊出行与专项收支</h2>
+        </div>
+        <p>把旅行、开户活动、买币换汇和一次性投资工具单独成账，记录原币金额、券、返现、赠股与最终净成本。</p>
+        <ul class="features">
+          <li>旅行账本</li>
+          <li>券与返现</li>
+          <li>港股赠股</li>
+          <li>买币与工具</li>
+        </ul>
+        <div class="actions">
+          <a class="primary-link" href="/特殊出行与专项收支/index.html" data-sync-route="/特殊出行与专项收支/index.html">进入专项收支</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <span class="icon pet-icon portrait-icon"><img src="./品牌资产/角色动图/星澄/star-tablet.gif?v=20260822-3looks" alt="星澄使用平板分析资产"></span>
+          <h2>洒一的投资工具箱</h2>
+        </div>
+        <p>管理股票持仓、开户奖励、港股打新和多币种汇率。股票直仓总资产会同步给财务管理，也可以记录本周操作复盘。</p>
+        <ul class="features">
+          <li>股票持仓</li>
+          <li>开户奖励</li>
+          <li>港股打新</li>
+          <li>本周复盘</li>
+        </ul>
+        <div class="actions">
+          <a class="primary-link" href="/洒一投资工具箱/index.html" data-sync-route="/洒一投资工具箱/index.html">进入投资工具箱</a>
+          <a class="ghost-link" href="/洒一投资工具箱/股票持仓.html" data-sync-route="/洒一投资工具箱/股票持仓.html">股票持仓</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <span class="icon pet-icon jinli-icon"><img src="./品牌资产/角色动图/金璃/review.gif" alt="金璃分析数据"></span>
+          <h2>洒一财务助理</h2>
+        </div>
+        <p>打开独立窗口时才启动本机财务助理；关闭窗口，服务随之停止。可用对话快速查找和分析财务记录。</p>
+        <ul class="features">
+          <li>本地分析</li>
+          <li>财务问答</li>
+          <li>历史对话</li>
+          <li>数据索引</li>
+        </ul>
+        <div class="actions">
+          <a class="primary-link" href="/launch-finance-assistant" data-assistant-link>打开财务助理</a>
+        </div>
+      </article>
+    </section>
+
+    <nav class="quick-row" aria-label="快捷入口">
+      <a href="/voice-ledger-stable/index.html" data-sync-route="/voice-ledger-stable/index.html">¥ 手机记账</a>
+      <a href="/支出与收入流水/index.html" data-sync-route="/支出与收入流水/index.html">支出与收入流水</a>
+      <a href="/特殊出行与专项收支/index.html" data-sync-route="/特殊出行与专项收支/index.html">特殊出行与专项收支</a>
+      <a href="/财务管理/index.html" data-sync-route="/财务管理/index.html">财务管理总览</a>
+      <a href="/洒一投资工具箱/股票持仓.html" data-sync-route="/洒一投资工具箱/股票持仓.html">📈 股票持仓</a>
+      <a href="/洒一投资工具箱/洒一开户奖励.html" data-sync-route="/洒一投资工具箱/洒一开户奖励.html">🎁 开户奖励</a>
+      <a href="/洒一投资工具箱/洒一港股打新.html" data-sync-route="/洒一投资工具箱/洒一港股打新.html">港股打新</a>
+      <a href="/launch-finance-assistant" data-assistant-link>✦ 洒一财务助理</a>
+    </nav>
+
+    <footer class="footer">© 2026 洒一的财务与投资</footer>
+  </main>
+  <script src="./site-auto-backup.js"></script>
+  <script>
+    const SITE_STORAGE_KEYS = {
+      finance: "personal-asset-manager:v1",
+      mobileLedger: "mobile-ledger:v1",
+      mobileLedgerSyncUrl: "mobile-ledger:sync-url",
+      mobileLedgerFinanceResetAt: "mobile-ledger:finance-reset-at",
+      stockPortfolio: "stockPortfolio_v3_anime",
+      accountRewards: "accountRewards_v4",
+      hkIpoRecords: "hkIpoRecords_v2",
+      exchangeRates: "sayi_exchange_rates_v2",
+      financeAssetSync: "sayi_finance_asset_sync_v1",
+      specialActivities: "sayi_special_activity_finance_v1",
+      legacyStockImportedAt: "sayi_legacy_stock_imported_at"
+    };
+    const SITE_AUTO_BACKUP_KEY = "sayi_finance_invest_all_backups_v1";
+    const DUTY_PARTNERS = {
+      0: { name: "樱露", image: "./品牌资产/角色动图/樱露/waving.gif?v=20260819-character2" },
+      1: { name: "金璃", image: "./品牌资产/sayi-finance-app-icon.png" },
+      2: { name: "紫铃", image: "./品牌资产/角色动图/紫铃/waving.gif" },
+      3: { name: "樱露", image: "./品牌资产/角色动图/樱露/waving.gif?v=20260819-character2" },
+      4: { name: "桃绘", image: "./品牌资产/角色动图/桃绘/taohui-duty.gif?v=20260822-gemini" },
+      5: { name: "星澄", image: "./品牌资产/角色动图/星澄/star-pose.gif?v=20260822-3looks" },
+      6: { name: "紫铃", image: "./品牌资产/角色动图/紫铃/waving.gif" }
+    };
+
+    function initializeDutyPartner(date = new Date()) {
+      const partner = DUTY_PARTNERS[date.getDay()];
+      const weekday = date.toLocaleDateString("zh-CN", { weekday: "long" });
+      const hero = document.getElementById("dutyHero");
+      const title = document.getElementById("dutyPartnerTitle");
+      const label = document.getElementById("dutyScheduleLabel");
+
+      document.querySelectorAll(".cast-member[data-character]").forEach((card) => {
+        card.hidden = card.dataset.character !== partner.name;
+      });
+      if (hero) {
+        hero.src = partner.image;
+        hero.alt = `${partner.name}，${weekday}值班伙伴`;
+      }
+      if (title) title.textContent = `今日值班伙伴 · ${partner.name}`;
+      if (label) label.textContent = `${weekday}由${partner.name}值班，主页面角色会每天自动轮换。`;
+    }
+
+    function safeParse(raw, fallback = null) {
+      if (!raw || raw === "null" || raw === "undefined") return fallback;
+      try { return typeof raw === "string" ? JSON.parse(raw) : raw; }
+      catch (error) { console.warn("JSON 解析失败", error); return fallback; }
+    }
+
+    function getAllLocalStorageRaw() {
+      const data = {};
+      for (let index = 0; index < localStorage.length; index += 1) {
+        const key = localStorage.key(index);
+        if (!key || key === SITE_AUTO_BACKUP_KEY || key === "mobile-ledger:voice-formal-pre-migration-backup:v1") continue;
+        data[key] = localStorage.getItem(key);
+      }
+      return data;
+    }
+
+    function getKnownRawData() {
+      return Object.fromEntries(Object.values(SITE_STORAGE_KEYS).map((key) => [key, localStorage.getItem(key)]));
+    }
+
+    function getStructuredSiteData() {
+      return {
+        finance: safeParse(localStorage.getItem(SITE_STORAGE_KEYS.finance), { transactions: [], assets: [], debts: [] }),
+        mobileLedger: safeParse(localStorage.getItem(SITE_STORAGE_KEYS.mobileLedger), { records: [] }),
+        investment: {
+          stockPortfolio: safeParse(localStorage.getItem(SITE_STORAGE_KEYS.stockPortfolio), {}),
+          accountRewards: safeParse(localStorage.getItem(SITE_STORAGE_KEYS.accountRewards), {}),
+          hkIpoRecords: safeParse(localStorage.getItem(SITE_STORAGE_KEYS.hkIpoRecords), {}),
+          exchangeRates: safeParse(localStorage.getItem(SITE_STORAGE_KEYS.exchangeRates), null),
+          financeAssetSync: safeParse(localStorage.getItem(SITE_STORAGE_KEYS.financeAssetSync), null)
+        },
+        specialActivities: safeParse(localStorage.getItem(SITE_STORAGE_KEYS.specialActivities), { projects: [], entries: [] }),
+        settings: {
+          mobileLedgerSyncUrl: localStorage.getItem(SITE_STORAGE_KEYS.mobileLedgerSyncUrl) || "",
+          mobileLedgerFinanceResetAt: localStorage.getItem(SITE_STORAGE_KEYS.mobileLedgerFinanceResetAt) || "",
+          legacyStockImportedAt: localStorage.getItem(SITE_STORAGE_KEYS.legacyStockImportedAt) || ""
+        }
+      };
+    }
+
+    function countActive(list) {
+      return (Array.isArray(list) ? list : []).filter((item) => !item.deleted).length;
+    }
+
+    function buildSiteStats(data = getStructuredSiteData()) {
+      const finance = data.finance || {};
+      const mobileLedger = data.mobileLedger || {};
+      const investment = data.investment || {};
+      return {
+        financeTransactions: Array.isArray(finance.transactions) ? finance.transactions.length : 0,
+        financeAssets: Array.isArray(finance.assets) ? finance.assets.length : 0,
+        financeDebts: Array.isArray(finance.debts) ? finance.debts.length : 0,
+        mobileRecords: Array.isArray(mobileLedger.records) ? mobileLedger.records.length : 0,
+        stockCount: countActive(investment.stockPortfolio?.stocks || (Array.isArray(investment.stockPortfolio) ? investment.stockPortfolio : [])),
+        accountCount: countActive(investment.accountRewards?.accounts || (Array.isArray(investment.accountRewards) ? investment.accountRewards : [])),
+        ipoCount: countActive(investment.hkIpoRecords?.records || (Array.isArray(investment.hkIpoRecords) ? investment.hkIpoRecords : [])),
+        specialProjectCount: countActive(data.specialActivities?.projects || []),
+        specialRecordCount: countActive(data.specialActivities?.entries || []),
+        localStorageKeys: localStorage.length
+      };
+    }
+
+    function createSiteLocalBackup(reason = "manual") {
+      const previousBackupRaw = localStorage.getItem(SITE_AUTO_BACKUP_KEY);
+      const backups = safeParse(previousBackupRaw, [])
+        .filter((item) => item && item.rawData)
+        .map((item) => {
+          const rawData = { ...item.rawData };
+          delete rawData[SITE_AUTO_BACKUP_KEY];
+          delete rawData["mobile-ledger:voice-formal-pre-migration-backup:v1"];
+          return { ...item, rawData };
+        });
+      const backup = {
+        id: "site_backup_" + Date.now(),
+        reason,
+        time: new Date().toISOString(),
+        rawData: getAllLocalStorageRaw()
+      };
+      backups.unshift(backup);
+      try {
+        localStorage.setItem(SITE_AUTO_BACKUP_KEY, JSON.stringify(backups.slice(0, 2)));
+      } catch (error) {
+        localStorage.removeItem(SITE_AUTO_BACKUP_KEY);
+        try {
+          localStorage.setItem(SITE_AUTO_BACKUP_KEY, JSON.stringify([backup]));
+        } catch (singleBackupError) {
+          if (previousBackupRaw) {
+            try { localStorage.setItem(SITE_AUTO_BACKUP_KEY, previousBackupRaw); }
+            catch (restoreError) { console.warn("恢复原本地备份失败", restoreError); }
+          }
+          console.warn("本地容量不足，已保留原备份并跳过本次备份", singleBackupError);
+        }
+      }
+      if (window.sayiSiteAutoFileBackup) window.sayiSiteAutoFileBackup.schedule(reason);
+      return backup;
+    }
+
+    async function enableSiteFileBackup() {
+      const button = document.getElementById("enableSiteFileBackupBtn");
+      const status = document.getElementById("siteFileBackupStatus");
+      if (!window.sayiSiteAutoFileBackup) {
+        alert("自动备份模块还没有加载完成，请刷新页面后再试。");
+        return;
+      }
+      if (status) status.textContent = "自动文件备份：正在请求文件夹授权...";
+      if (button) {
+        button.disabled = true;
+        button.textContent = "正在开启...";
+      }
+      try {
+        const ok = await window.sayiSiteAutoFileBackup.chooseBackupFolder();
+        await window.sayiSiteAutoFileBackup.refreshStatus("siteFileBackupStatus");
+        if (ok) updateSiteDataStatus();
+      } catch (error) {
+        const message = error.message || error;
+        if (status) status.textContent = "自动文件备份：开启失败，" + message;
+        alert("开启自动备份失败：" + message);
+      } finally {
+        if (button) {
+          button.disabled = false;
+          button.textContent = "开启自动备份";
+        }
+      }
+    }
+
+    async function saveSiteFileBackupNow(reason = "manual_site_backup") {
+      if (!window.sayiSiteAutoFileBackup) {
+        alert("自动备份模块还没有加载完成，请刷新页面后再试。");
+        return false;
+      }
+      const ok = await window.sayiSiteAutoFileBackup.saveNow(reason).catch((error) => {
+        console.warn("全站自动文件备份失败", error);
+        alert("备份失败：" + (error.message || error));
+        return false;
+      });
+      await window.sayiSiteAutoFileBackup.refreshStatus("siteFileBackupStatus");
+      if (!ok) {
+        alert("还没有开启自动文件备份。请先点“开启自动备份”，授权备份文件夹。");
+        return false;
+      }
+      updateSiteDataStatus();
+      return true;
+    }
+
+    function exportAllSiteData() {
+      const data = getStructuredSiteData();
+      const stats = buildSiteStats(data);
+      const totalCount = stats.financeTransactions + stats.financeAssets + stats.financeDebts + stats.mobileRecords + stats.stockCount + stats.accountCount + stats.ipoCount + stats.specialProjectCount + stats.specialRecordCount;
+      if (totalCount === 0 && localStorage.length === 0) {
+        alert("暂无数据可导出。");
+        return;
+      }
+
+      const exportData = {
+        app: "sayi-finance-invest-all",
+        version: "1.0-safe-json",
+        exportTime: new Date().toISOString(),
+        data,
+        rawData: getKnownRawData(),
+        allLocalStorage: getAllLocalStorageRaw(),
+        stats
+      };
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `洒一财务与投资全量备份_${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      createSiteLocalBackup("manual_export");
+      if (window.sayiSiteAutoFileBackup) window.sayiSiteAutoFileBackup.saveNow("manual_export").then(() => window.sayiSiteAutoFileBackup.refreshStatus("siteFileBackupStatus")).catch((error) => console.warn("全站自动文件备份失败", error));
+      alert(`数据已导出！\n\n手机记账：${stats.mobileRecords} 条\n财务流水：${stats.financeTransactions} 条\n资产账户：${stats.financeAssets} 个\n负债账户：${stats.financeDebts} 个\n股票持仓：${stats.stockCount} 条\n开户奖励：${stats.accountCount} 条\n港股打新：${stats.ipoCount} 条\n专项账本：${stats.specialProjectCount} 本 · ${stats.specialRecordCount} 条\n\n同时保留原始 localStorage，方便跨页面恢复。`);
+      updateSiteDataStatus();
+    }
+
+    function normalizeImportedModule(imported, key) {
+      if (!imported || typeof imported !== "object") return null;
+      if (imported.allLocalStorage && Object.prototype.hasOwnProperty.call(imported.allLocalStorage, key)) return imported.allLocalStorage[key];
+      if (imported.rawData && Object.prototype.hasOwnProperty.call(imported.rawData, key)) return imported.rawData[key];
+      const data = imported.data || imported;
+      if (key === SITE_STORAGE_KEYS.finance && data.finance) return JSON.stringify(data.finance);
+      if (key === SITE_STORAGE_KEYS.mobileLedger && data.mobileLedger) return JSON.stringify(data.mobileLedger);
+      if (key === SITE_STORAGE_KEYS.stockPortfolio && data.investment?.stockPortfolio) return JSON.stringify(data.investment.stockPortfolio);
+      if (key === SITE_STORAGE_KEYS.accountRewards && data.investment?.accountRewards) return JSON.stringify(data.investment.accountRewards);
+      if (key === SITE_STORAGE_KEYS.hkIpoRecords && data.investment?.hkIpoRecords) return JSON.stringify(data.investment.hkIpoRecords);
+      if (key === SITE_STORAGE_KEYS.exchangeRates && data.investment?.exchangeRates) return JSON.stringify(data.investment.exchangeRates);
+      if (key === SITE_STORAGE_KEYS.financeAssetSync && data.investment?.financeAssetSync) return JSON.stringify(data.investment.financeAssetSync);
+      if (key === SITE_STORAGE_KEYS.specialActivities && data.specialActivities) return JSON.stringify(data.specialActivities);
+
+      // 兼容投资工具箱原来的备份格式。
+      if (key === SITE_STORAGE_KEYS.stockPortfolio && data.stockPortfolio) return JSON.stringify(data.stockPortfolio);
+      if (key === SITE_STORAGE_KEYS.accountRewards && data.accountRewards) return JSON.stringify(data.accountRewards);
+      if (key === SITE_STORAGE_KEYS.hkIpoRecords && data.hkIpoRecords) return JSON.stringify(data.hkIpoRecords);
+      return null;
+    }
+
+    function importAllSiteData(input) {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const imported = JSON.parse(event.target.result);
+          if (!imported || typeof imported !== "object") throw new Error("备份文件不是有效 JSON 对象");
+          createSiteLocalBackup("before_import_" + file.name);
+
+          let importedCount = 0;
+          const keysToRestore = new Set(Object.values(SITE_STORAGE_KEYS));
+          if (imported.app === "sayi-finance-invest-all" && imported.allLocalStorage) {
+            Object.keys(imported.allLocalStorage).forEach((key) => keysToRestore.add(key));
+          }
+
+          keysToRestore.forEach((key) => {
+            const raw = normalizeImportedModule(imported, key);
+            if (raw === null || raw === undefined) return;
+            localStorage.setItem(key, typeof raw === "string" ? raw : JSON.stringify(raw));
+            importedCount += 1;
+          });
+
+          if (importedCount === 0) {
+            alert("没有识别到可导入的数据。当前数据没有被覆盖。");
+            return;
+          }
+
+          const stats = buildSiteStats(getStructuredSiteData());
+          if (window.sayiSiteAutoFileBackup) {
+            localStorage.setItem("sayi_site_file_backup_pending_reason", "after_import");
+            await window.sayiSiteAutoFileBackup.saveNow("after_import").catch((error) => console.warn("导入后的全站自动文件备份失败", error));
+          }
+          alert(`数据导入成功！导入前已自动保存当前数据。\n\n已恢复 ${importedCount} 个数据项。\n手机记账：${stats.mobileRecords} 条\n财务流水：${stats.financeTransactions} 条\n股票持仓：${stats.stockCount} 条\n开户奖励：${stats.accountCount} 条\n港股打新：${stats.ipoCount} 条\n专项账本：${stats.specialProjectCount} 本 · ${stats.specialRecordCount} 条\n\n页面将刷新。`);
+          location.reload();
+        } catch (error) {
+          console.error(error);
+          alert("导入失败：" + error.message + "\n\n当前数据没有被覆盖。");
+        } finally {
+          input.value = "";
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function restoreLatestSiteBackup() {
+      const backups = safeParse(localStorage.getItem(SITE_AUTO_BACKUP_KEY), []);
+      if (!backups.length) {
+        alert("目前没有找到主页面本地备份。");
+        return;
+      }
+      const latest = backups[0];
+      const ok = confirm("将恢复最近一次主页面本地备份。\n\n备份时间：" + new Date(latest.time).toLocaleString("zh-CN") + "\n原因：" + latest.reason + "\n\n当前数据会被覆盖，覆盖前也会再保存一次。继续吗？");
+      if (!ok) return;
+      createSiteLocalBackup("before_restore_latest_site_backup");
+      Object.entries(latest.rawData || {}).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) localStorage.setItem(key, value);
+      });
+      if (window.sayiSiteAutoFileBackup) localStorage.setItem("sayi_site_file_backup_pending_reason", "after_restore_latest_site_backup");
+      alert("已恢复最近一次本地备份，页面将刷新。");
+      location.reload();
+    }
+
+    function dailySiteLocalBackup() {
+      const today = new Date().toISOString().slice(0, 10);
+      const last = localStorage.getItem("sayi_site_last_local_backup_date");
+      if (last === today) return;
+      createSiteLocalBackup("daily_site_local_backup");
+      localStorage.setItem("sayi_site_last_local_backup_date", today);
+    }
+
+    function updateSiteDataStatus() {
+      const status = document.getElementById("siteDataStatus");
+      if (!status) return;
+      const stats = buildSiteStats();
+      const lastBackup = safeParse(localStorage.getItem(SITE_AUTO_BACKUP_KEY), [])[0];
+      const backupText = lastBackup ? `最近本地备份：${new Date(lastBackup.time).toLocaleString("zh-CN")}。` : "尚未生成主页面本地备份。";
+      status.textContent = `覆盖手机记账 ${stats.mobileRecords} 条、财务流水 ${stats.financeTransactions} 条、股票持仓 ${stats.stockCount} 条、开户奖励 ${stats.accountCount} 条、港股打新 ${stats.ipoCount} 条、专项账本 ${stats.specialProjectCount} 本 / ${stats.specialRecordCount} 条。${backupText} 各一级页面自己的导入导出仍然保留。`;
+    }
+
+    let lastMobileLedgerSavedAt = "";
+
+    async function updateMobileLedgerLiveStatus() {
+      const status = document.getElementById("mobileLedgerLiveStatus");
+      const latest = document.getElementById("mobileLedgerLatest");
+      if (!status || !latest) return;
+      const receiverBase = location.protocol === "file:" ? "http://localhost:4176" : location.origin;
+      try {
+        const statusResponse = await fetch(`${receiverBase}/api/status?t=${Date.now()}`, { cache: "no-store" });
+        const receiver = await statusResponse.json();
+        if (!receiver.ok) throw new Error("接收器未就绪");
+        status.className = "online";
+        status.textContent = `在线 · ${receiver.records || 0} 条 · ${receiver.savedAt ? new Date(receiver.savedAt).toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }) : "等待首次同步"}`;
+        if (receiver.savedAt === lastMobileLedgerSavedAt && latest.dataset.loaded === "1") return;
+        const recordsResponse = await fetch(`${receiverBase}/api/records?t=${Date.now()}`, { cache: "no-store" });
+        const payload = await recordsResponse.json();
+        const records = Array.isArray(payload.records) ? payload.records : [];
+        const rows = records.sort((a, b) => String(b.updatedAt || b.createdAt || b.date || "").localeCompare(String(a.updatedAt || a.createdAt || a.date || ""))).slice(0, 3);
+        latest.innerHTML = rows.length ? rows.map((record) => {
+          const sign = record.type === "income" ? "+" : "−";
+          return `<div class="ledger-latest-row"><time>${String(record.date || "").slice(5).replace("-", "/")}</time><span>${escapeSiteHtml(record.category || "其他")}${record.note ? ` · ${escapeSiteHtml(record.note)}` : ""}</span><strong>${sign}¥${Number(record.amount || 0).toFixed(2)}</strong></div>`;
+        }).join("") : "<span>电脑接收器中还没有记账记录。</span>";
+        latest.dataset.loaded = "1";
+        lastMobileLedgerSavedAt = receiver.savedAt || "";
+      } catch (error) {
+        status.className = "offline";
+        status.textContent = "未连接，请启动手机记账接收器";
+        latest.innerHTML = "<span>手机数据仍保存在手机本地，接收器恢复后可继续同步。</span>";
+      }
+    }
+
+    function escapeSiteHtml(value) {
+      const node = document.createElement("div");
+      node.textContent = String(value || "");
+      return node.innerHTML;
+    }
+
+    initializeDutyPartner();
+    if (location.protocol === "file:") {
+      document.querySelectorAll("[data-sync-route]").forEach((link) => {
+        link.href = `http://localhost:4176${link.dataset.syncRoute}`;
+      });
+      document.querySelectorAll("[data-assistant-link]").forEach((link) => {
+        link.href = "sayi-finance-assistant://open";
+      });
+    } else {
+      document.querySelectorAll("[data-assistant-link]").forEach((link) => {
+        link.addEventListener("click", async (event) => {
+          event.preventDefault();
+          if (link.dataset.launching === "1") return;
+          link.dataset.launching = "1";
+          const label = link.textContent;
+          link.textContent = "正在打开…";
+          try {
+            const response = await fetch(link.href, { headers: { Accept: "application/json" }, cache: "no-store" });
+            if (!response.ok) throw new Error("财务助理暂时无法打开，请检查应用是否存在。");
+          } catch (error) {
+            window.alert(error.message || "财务助理暂时无法打开。");
+          } finally {
+            link.textContent = label;
+            link.dataset.launching = "0";
+          }
+        });
+      });
+    }
+    updateSiteDataStatus();
+    updateMobileLedgerLiveStatus();
+    window.setInterval(updateMobileLedgerLiveStatus, 5000);
+    dailySiteLocalBackup();
+    if (window.sayiSiteAutoFileBackup) window.sayiSiteAutoFileBackup.refreshStatus("siteFileBackupStatus");
+  </script>
+</body>
+</html>

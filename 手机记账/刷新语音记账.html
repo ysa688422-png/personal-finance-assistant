@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#ffdc42" />
+    <title>正在刷新语音记账</title>
+    <style>
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #fff8fb; color: #2b2335; font-family: "PingFang SC", sans-serif; }
+      main { width: min(82vw, 420px); text-align: center; }
+      strong { display: block; font-size: 26px; margin-bottom: 12px; }
+      p { color: #766c80; line-height: 1.7; }
+    </style>
+  </head>
+  <body>
+    <main><strong>正在更新语音记账</strong><p id="status">正在清理旧页面缓存，账本数据不会被删除。</p></main>
+    <script>
+      (async () => {
+        const refreshMarker = "mobile-ledger:cache-refresh:image-ledger-4";
+        const forceRefresh = new URLSearchParams(location.search).get("force") === "1";
+        try {
+          if (forceRefresh || !localStorage.getItem(refreshMarker)) {
+            if ("serviceWorker" in navigator) {
+              const registrations = await navigator.serviceWorker.getRegistrations();
+              await Promise.all(registrations.filter((registration) => registration.scope.includes("/voice-ledger")).map((registration) => registration.unregister()));
+            }
+            if ("caches" in window) {
+              const keys = await caches.keys();
+              await Promise.all(keys.filter((key) => key.startsWith("mobile-voice-ledger-formal-") || key.startsWith("mobile-ledger-v")).map((key) => caches.delete(key)));
+            }
+            localStorage.setItem(refreshMarker, new Date().toISOString());
+          }
+        } catch (_) {}
+        location.replace(`/voice-ledger-stable/index.html?fresh=${Date.now()}`);
+      })();
+    </script>
+  </body>
+</html>

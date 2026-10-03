@@ -1,0 +1,2931 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#ff6b9d">
+    <title>日内期权交易记录 - 洒一投资工具箱</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../site-auto-backup.js"></script>
+    <script src="./auto-backup.js"></script>
+    <link rel="stylesheet" href="../music-player.css?v=20260824b">
+    <script defer src="../music-player.js?v=20260824b" data-page="options"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #ff6b9d;
+            --secondary: #c44569;
+            --accent: #f8b500;
+            --dark: #1a1a2e;
+            --darker: #16213e;
+            --chainsaw-red: #ff2d55;
+            --mygo-cyan: #00d9ff;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --glass: rgba(255, 255, 255, 0.12);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --win: #00b894;
+            --loss: #ff4757;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", "Noto Sans SC", sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 48%, #0f3460 100%);
+            overflow-x: hidden;
+        }
+
+        .anime-bg {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.08;
+        }
+
+        .anime-bg::before {
+            content: "OPTION!";
+            position: absolute;
+            top: 6%;
+            right: 3%;
+            color: var(--chainsaw-red);
+            font-size: 100px;
+            font-weight: 900;
+            transform: rotate(-14deg);
+            text-shadow: 0 0 30px rgba(255, 45, 85, 0.5);
+        }
+
+        .anime-bg::after {
+            content: "CHART";
+            position: absolute;
+            bottom: 9%;
+            left: 3%;
+            color: var(--mygo-cyan);
+            font-size: 90px;
+            font-weight: 900;
+            transform: rotate(10deg);
+            text-shadow: 0 0 30px rgba(0, 217, 255, 0.5);
+        }
+
+        .float-mark {
+            position: fixed;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.18;
+            font-size: 34px;
+            animation: floatMark 5s ease-in-out infinite;
+        }
+
+        .mark-1 { top: 18%; left: 8%; color: var(--primary); animation-delay: 0s; }
+        .mark-2 { top: 28%; right: 13%; color: var(--accent); animation-delay: 1s; }
+        .mark-3 { bottom: 24%; right: 7%; color: var(--mygo-cyan); animation-delay: 2s; }
+
+        @keyframes floatMark {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-18px) rotate(8deg); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1320px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            margin-bottom: 16px;
+            padding: 9px 14px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+            padding: 28px 18px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            margin-bottom: 10px;
+            color: #fff;
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, var(--chainsaw-red), var(--primary), var(--mygo-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 24px rgba(255, 107, 157, 0.45);
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.72);
+            font-size: 1rem;
+        }
+
+        .quick-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .quick-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            padding: 10px 18px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 900;
+            border-radius: 999px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            box-shadow: 0 8px 22px rgba(255, 107, 157, 0.26);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .quick-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 26px rgba(255, 107, 157, 0.36);
+        }
+
+        .quick-link.signal {
+            background: linear-gradient(135deg, var(--mygo-cyan), #0078a8);
+            box-shadow: 0 8px 22px rgba(0, 217, 255, 0.22);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            min-height: 112px;
+            padding: 18px;
+            border-radius: 16px;
+            background: var(--card-bg);
+            box-shadow: var(--shadow);
+            border: 2px solid transparent;
+        }
+
+        .summary-card:nth-child(1) { border-color: rgba(255, 107, 157, 0.38); }
+        .summary-card:nth-child(2) { border-color: rgba(0, 217, 255, 0.34); }
+        .summary-card:nth-child(3) { border-color: rgba(248, 181, 0, 0.36); }
+        .summary-card:nth-child(4) { border-color: rgba(255, 45, 85, 0.32); }
+
+        .summary-label {
+            margin-bottom: 8px;
+            color: #667;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .summary-value {
+            color: var(--dark);
+            font-size: 1.55rem;
+            font-weight: 900;
+            word-break: break-word;
+        }
+
+        .summary-note {
+            margin-top: 7px;
+            color: #777;
+            font-size: 0.84rem;
+            line-height: 1.4;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 420px minmax(0, 1fr);
+            gap: 22px;
+            align-items: start;
+        }
+
+        .panel {
+            border-radius: 18px;
+            background: var(--card-bg);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .panel-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px 18px;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .panel-title h2 {
+            font-size: 1.1rem;
+        }
+
+        .panel-body {
+            padding: 18px;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 13px;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 6px;
+            color: #555;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .field-label-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .field-label-row label {
+            margin-bottom: 0;
+        }
+
+        .voice-btn {
+            min-height: 30px;
+            padding: 5px 11px;
+            border: 1px solid rgba(196, 69, 105, 0.18);
+            color: var(--secondary);
+            background: #fff0f5;
+            font-size: 0.78rem;
+            box-shadow: none;
+            white-space: nowrap;
+        }
+
+        .voice-btn.listening {
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            box-shadow: 0 0 0 4px rgba(255, 107, 157, 0.14);
+        }
+
+        .voice-btn.unsupported {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            min-height: 42px;
+            padding: 10px 12px;
+            border: 2px solid #f0d5df;
+            border-radius: 12px;
+            background: #fff;
+            color: #333;
+            font: inherit;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        textarea {
+            min-height: 82px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(255, 107, 157, 0.14);
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        button, .file-button {
+            min-height: 42px;
+            padding: 10px 16px;
+            border: 0;
+            border-radius: 999px;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            font: inherit;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover, .file-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 157, 0.28);
+        }
+
+        button.secondary, .file-button.secondary {
+            background: linear-gradient(135deg, #00d9ff, #0078a8);
+        }
+
+        button.ghost {
+            color: var(--secondary);
+            background: #fff0f5;
+        }
+
+        .review-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .review-card {
+            min-height: 180px;
+            padding: 16px;
+            border: 2px solid rgba(255, 107, 157, 0.18);
+            border-radius: 16px;
+            background: linear-gradient(180deg, #fff, #fff7fb);
+        }
+
+        .review-card h3 {
+            margin-bottom: 10px;
+            color: var(--secondary);
+            font-size: 1rem;
+        }
+
+        .review-card p {
+            color: #555;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .trade-image-panel {
+            margin-bottom: 18px;
+            padding: 16px;
+            border-radius: 16px;
+            background: linear-gradient(180deg, #ffffff, #fff7fb);
+            border: 2px solid rgba(255, 107, 157, 0.2);
+        }
+
+        .trade-image-edit-dock {
+            margin-top: 18px;
+        }
+
+        .trade-image-edit-dock .trade-image-panel {
+            margin-bottom: 18px;
+        }
+
+        .trade-image-edit-dock .trade-image-controls {
+            grid-template-columns: 1fr;
+            align-items: stretch;
+        }
+
+        .trade-image-edit-dock .trade-image-actions {
+            flex-wrap: wrap;
+        }
+
+        .trade-image-controls {
+            display: grid;
+            grid-template-columns: 160px auto auto auto auto;
+            gap: 10px;
+            align-items: end;
+            margin-bottom: 12px;
+        }
+
+        .trade-image-paste {
+            margin-bottom: 12px;
+            padding: 16px;
+            border: 2px dashed rgba(255, 107, 157, 0.42);
+            border-radius: 16px;
+            color: #555;
+            background: linear-gradient(135deg, #fff7fb, #f7fcff);
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+        }
+
+        .trade-image-paste:focus,
+        .trade-image-paste.drag-over {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(255, 107, 157, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .trade-image-paste strong {
+            display: block;
+            margin-bottom: 4px;
+            color: var(--secondary);
+            font-size: 1rem;
+        }
+
+        .trade-image-paste span {
+            color: #778;
+            font-size: 0.88rem;
+            line-height: 1.45;
+        }
+
+        .trade-image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .trade-image-thumb {
+            display: grid;
+            gap: 6px;
+            padding: 8px;
+            border: 2px solid #f0d5df;
+            border-radius: 14px;
+            background: #fff;
+            color: var(--dark);
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .trade-image-thumb.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(255, 107, 157, 0.14);
+        }
+
+        .trade-image-thumb img {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
+            border-radius: 10px;
+            background: #f5f6fa;
+        }
+
+        .trade-image-thumb strong {
+            font-size: 0.84rem;
+        }
+
+        .trade-image-thumb span {
+            color: #778;
+            font-size: 0.76rem;
+            font-weight: 700;
+        }
+
+        .trade-image-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .trade-image-actions button.active {
+            box-shadow: 0 0 0 4px rgba(255, 107, 157, 0.16), 0 8px 20px rgba(255, 107, 157, 0.22);
+            transform: translateY(-1px);
+        }
+
+        .trade-image-stage {
+            position: relative;
+            min-height: 360px;
+            overflow: hidden;
+            border-radius: 16px;
+            background:
+                linear-gradient(135deg, rgba(255,255,255,0.88), rgba(247,252,255,0.9)),
+                repeating-linear-gradient(90deg, rgba(0,0,0,0.035) 0 1px, transparent 1px 48px),
+                repeating-linear-gradient(0deg, rgba(0,0,0,0.028) 0 1px, transparent 1px 48px);
+            border: 1px solid #f0d5df;
+        }
+
+        .trade-image-stage canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            cursor: crosshair;
+        }
+
+        .trade-image-empty {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            padding: 28px;
+            color: #778;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .trade-image-empty strong {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-size: 1.08rem;
+        }
+
+        .trade-image-stage.has-image .trade-image-empty {
+            display: none;
+        }
+
+        .trade-marker-list {
+            display: grid;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .trade-marker-item {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: center;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: #fff;
+            border: 1px solid #f0d5df;
+        }
+
+        .trade-marker-item strong {
+            color: var(--dark);
+        }
+
+        .trade-marker-item span {
+            color: #778;
+            font-size: 0.86rem;
+        }
+
+        .trade-marker-item.buy {
+            border-color: rgba(0, 184, 148, 0.35);
+            background: rgba(0, 184, 148, 0.06);
+        }
+
+        .trade-marker-item.sell {
+            border-color: rgba(255, 71, 87, 0.35);
+            background: rgba(255, 71, 87, 0.06);
+        }
+
+        .trade-marker-item button {
+            min-height: 32px;
+            padding: 6px 11px;
+            font-size: 0.8rem;
+        }
+
+        .market-panel {
+            margin-bottom: 18px;
+            padding: 16px;
+            border-radius: 16px;
+            background: linear-gradient(180deg, #ffffff, #f7fcff);
+            border: 2px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .market-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .market-head h3 {
+            color: var(--secondary);
+            font-size: 1rem;
+        }
+
+        .market-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr auto;
+            gap: 10px;
+            align-items: end;
+            margin-bottom: 14px;
+        }
+
+        .market-chart-wrap {
+            position: relative;
+            height: 330px;
+            border-radius: 14px;
+            background: #fff;
+            border: 1px solid #d7f6ff;
+            padding: 12px;
+        }
+
+        .market-status {
+            min-height: 22px;
+            color: #667;
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        .calendar-panel {
+            margin-bottom: 18px;
+            padding: 16px;
+            border-radius: 16px;
+            background: linear-gradient(180deg, #ffffff, #fff7fb);
+            border: 2px solid rgba(255, 107, 157, 0.18);
+        }
+
+        .calendar-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .calendar-head h3 {
+            color: var(--secondary);
+            font-size: 1rem;
+        }
+
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .calendar-nav button {
+            min-width: 42px;
+            min-height: 36px;
+            padding: 6px 12px;
+        }
+
+        .calendar-month {
+            min-width: 112px;
+            color: var(--dark);
+            font-weight: 900;
+            text-align: center;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .calendar-selected-summary {
+            margin-bottom: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            color: #555;
+            background: #f8f9fb;
+            border: 1px solid #edf0f5;
+            font-weight: 800;
+            line-height: 1.5;
+        }
+
+        .calendar-weekday {
+            color: #778;
+            font-size: 0.82rem;
+            font-weight: 900;
+            text-align: center;
+        }
+
+        .calendar-day {
+            min-height: 82px;
+            padding: 8px;
+            border: 1px solid #f0d5df;
+            border-radius: 12px;
+            background: #fff;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+        }
+
+        .calendar-day:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(255, 107, 157, 0.14);
+        }
+
+        .calendar-day.empty {
+            cursor: default;
+            background: transparent;
+            border-color: transparent;
+            box-shadow: none;
+        }
+
+        .calendar-day.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.16);
+        }
+
+        .calendar-day.win {
+            background: linear-gradient(180deg, rgba(0, 184, 148, 0.16), #fff);
+            border-color: rgba(0, 184, 148, 0.45);
+        }
+
+        .calendar-day.loss {
+            background: linear-gradient(180deg, rgba(255, 71, 87, 0.14), #fff);
+            border-color: rgba(255, 71, 87, 0.42);
+        }
+
+        .calendar-day.flat {
+            background: linear-gradient(180deg, rgba(99, 110, 114, 0.12), #fff);
+            border-color: rgba(99, 110, 114, 0.32);
+        }
+
+        .calendar-day-number {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--dark);
+            font-weight: 900;
+        }
+
+        .calendar-day-pnl {
+            margin-top: 8px;
+            color: var(--dark);
+            font-size: 0.84rem;
+            font-weight: 900;
+        }
+
+        .calendar-day-count {
+            margin-top: 4px;
+            color: #778;
+            font-size: 0.76rem;
+            font-weight: 700;
+        }
+
+        .calendar-detail {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .calendar-column {
+            min-height: 120px;
+            padding: 14px;
+            border-radius: 14px;
+            background: #fff;
+            border: 1px solid #f0d5df;
+        }
+
+        .calendar-column h4 {
+            margin-bottom: 10px;
+            color: var(--dark);
+            font-size: 0.98rem;
+        }
+
+        .calendar-column.win h4 { color: var(--win); }
+        .calendar-column.loss h4 { color: var(--loss); }
+
+        .calendar-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .calendar-item {
+            padding: 10px;
+            border-radius: 12px;
+            background: #f8f9fb;
+            color: #444;
+            line-height: 1.45;
+        }
+
+        .calendar-item strong {
+            display: block;
+            margin-bottom: 4px;
+            color: var(--dark);
+        }
+
+        .daily-conclusion-panel {
+            margin-top: 18px;
+            padding: 14px;
+            border-radius: 16px;
+            background: linear-gradient(180deg, #fff, #fff7fb);
+            border: 2px solid rgba(255, 107, 157, 0.16);
+        }
+
+        .daily-conclusion-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .daily-conclusion-head h3 {
+            color: var(--secondary);
+            font-size: 1rem;
+        }
+
+        .daily-conclusion-list {
+            display: grid;
+            gap: 9px;
+            max-height: 460px;
+            overflow: auto;
+            padding-right: 2px;
+        }
+
+        .daily-conclusion-item {
+            width: 100%;
+            padding: 11px 12px;
+            border-radius: 14px;
+            border: 1px solid #f0d5df;
+            background: #fff;
+            color: #444;
+            text-align: left;
+            box-shadow: 0 5px 14px rgba(0, 0, 0, 0.05);
+        }
+
+        .daily-conclusion-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(255, 107, 157, 0.13);
+        }
+
+        .daily-conclusion-date {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 6px;
+            color: var(--dark);
+            font-weight: 900;
+        }
+
+        .daily-conclusion-text {
+            color: #555;
+            font-size: 0.88rem;
+            line-height: 1.45;
+            white-space: pre-wrap;
+        }
+
+        .calendar-hint {
+            margin-top: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            color: #667;
+            background: #f8f9fb;
+            border: 1px dashed #e5d5dc;
+            font-size: 0.9rem;
+            font-weight: 800;
+            line-height: 1.5;
+        }
+
+        .day-detail-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 30;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(12, 12, 24, 0.62);
+            backdrop-filter: blur(8px);
+        }
+
+        .day-detail-modal.open {
+            display: flex;
+        }
+
+        .day-detail-dialog {
+            width: min(920px, 100%);
+            max-height: min(86vh, 900px);
+            overflow: auto;
+            border-radius: 20px;
+            background: #fff;
+            box-shadow: 0 20px 70px rgba(0, 0, 0, 0.36);
+            border: 1px solid rgba(255, 255, 255, 0.45);
+        }
+
+        .day-detail-head {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px 18px;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .day-detail-head h3 {
+            font-size: 1.08rem;
+        }
+
+        .day-detail-close {
+            min-width: 42px;
+            padding: 8px 12px;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .day-detail-body {
+            display: grid;
+            gap: 14px;
+            padding: 18px;
+        }
+
+        .day-detail-dialog .trade-image-panel {
+            margin: 0 18px 18px;
+        }
+
+        .day-detail-summary {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .day-detail-stat {
+            padding: 12px;
+            border-radius: 14px;
+            background: #f8f9fb;
+            border: 1px solid #edf0f5;
+        }
+
+        .day-detail-stat span {
+            display: block;
+            margin-bottom: 4px;
+            color: #778;
+            font-size: 0.78rem;
+            font-weight: 800;
+        }
+
+        .day-detail-stat strong {
+            color: var(--dark);
+            font-size: 1.04rem;
+        }
+
+        .day-detail-section {
+            padding: 14px;
+            border-radius: 16px;
+            background: linear-gradient(180deg, #fff, #fffafd);
+            border: 1px solid #f0d5df;
+        }
+
+        .day-detail-section h4 {
+            margin-bottom: 10px;
+            color: var(--secondary);
+            font-size: 0.98rem;
+        }
+
+        .day-detail-records {
+            display: grid;
+            gap: 10px;
+        }
+
+        .day-detail-record {
+            padding: 12px;
+            border-radius: 14px;
+            background: #f8f9fb;
+            border: 1px solid #edf0f5;
+        }
+
+        .day-detail-record-head {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-weight: 900;
+        }
+
+        .day-detail-text {
+            color: #555;
+            line-height: 1.55;
+            white-space: pre-wrap;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .toolbar input {
+            max-width: 240px;
+        }
+
+        .records {
+            display: grid;
+            gap: 12px;
+        }
+
+        .records-export-panel {
+            display: none;
+            margin-top: 12px;
+            padding: 14px;
+            border-radius: 16px;
+            background: linear-gradient(180deg, #fff, #fff7fb);
+            border: 2px solid rgba(255, 107, 157, 0.16);
+        }
+
+        .records-export-panel.open {
+            display: block;
+        }
+
+        .export-select-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .export-selected-count {
+            color: #667;
+            font-size: 0.88rem;
+            font-weight: 800;
+        }
+
+        .export-check-list {
+            display: grid;
+            gap: 8px;
+            max-height: 420px;
+            overflow: auto;
+            padding-right: 2px;
+        }
+
+        .export-check-item {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: center;
+            padding: 11px 12px;
+            border-radius: 14px;
+            background: #fff;
+            border: 1px solid #f0d5df;
+        }
+
+        .export-check-item input {
+            width: 20px;
+            min-height: 20px;
+            accent-color: var(--primary);
+        }
+
+        .export-check-main strong {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+
+        .export-check-main span {
+            color: #667;
+            font-size: 0.84rem;
+            font-weight: 800;
+        }
+
+        .export-check-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .export-check-actions button {
+            min-height: 32px;
+            padding: 6px 11px;
+            font-size: 0.8rem;
+        }
+
+        .record-card {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 14px;
+            padding: 16px;
+            border-radius: 16px;
+            background: #fff;
+            border: 1px solid #f2dbe4;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        .record-main h3 {
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-size: 1.06rem;
+        }
+
+        .record-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            min-height: 28px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            color: #555;
+            background: #f5f6fa;
+            font-size: 0.84rem;
+            font-weight: 700;
+        }
+
+        .pill.win { color: #fff; background: var(--win); }
+        .pill.loss { color: #fff; background: var(--loss); }
+        .pill.flat { color: #fff; background: #636e72; }
+
+        .record-text {
+            color: #555;
+            line-height: 1.55;
+            white-space: pre-wrap;
+        }
+
+        .record-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .record-actions button {
+            min-width: 76px;
+            min-height: 34px;
+            padding: 7px 12px;
+            font-size: 0.86rem;
+        }
+
+        .empty-state {
+            padding: 32px;
+            color: #777;
+            text-align: center;
+            border-radius: 16px;
+            background: #fff7fb;
+            border: 1px dashed #e9b8cb;
+        }
+
+        .hidden-file { display: none; }
+
+        @media (max-width: 980px) {
+            body { padding: 12px; }
+            .summary-grid, .review-grid, .main-grid, .market-controls, .calendar-detail, .day-detail-summary { grid-template-columns: 1fr; }
+            .trade-image-controls { grid-template-columns: 1fr; }
+            .header h1 { font-size: 1.7rem; }
+            .anime-bg::before, .anime-bg::after, .float-mark { display: none; }
+            .two-col { grid-template-columns: 1fr; }
+            .record-card { grid-template-columns: 1fr; }
+            .record-actions { flex-direction: row; flex-wrap: wrap; }
+            .market-chart-wrap { height: 260px; }
+            .trade-image-stage { min-height: 260px; }
+            .day-detail-modal { padding: 10px; }
+            .day-detail-body { padding: 14px; }
+            .calendar-grid { gap: 5px; }
+            .calendar-day { min-height: 66px; padding: 6px; }
+            .calendar-day-pnl, .calendar-day-count { font-size: 0.72rem; }
+        }
+    </style>
+    <link rel="stylesheet" href="../sayi-anime-theme.css?v=20260621-cream2">
+</head>
+<body>
+<nav data-public-navigation style="padding:10px 20px;background:#f7f1e9;color:#413831;font:14px sans-serif;position:relative;z-index:10"><a href="./index.html">投资工具箱</a> · <a href="./长桥数据.html">长桥数据</a> · <a href="../index.html">个人财务与投资</a></nav>
+    <div class="anime-bg"></div>
+    <div class="float-mark mark-1">✦</div>
+    <div class="float-mark mark-2">⚡</div>
+    <div class="float-mark mark-3">♪</div>
+
+    <main class="container">
+        <a class="back-link" href="index.html">← 返回投资工具箱</a>
+
+        <section class="header">
+            <h1>⚡ 日内期权交易记录</h1>
+            <p>交易、盈亏、心得、走势复盘，收盘后把今天讲清楚。</p>
+            <div class="quick-links">
+                <a class="quick-link" href="https://xiaoyinsi.com/courses/cs4c7fdbdf" target="_blank" rel="noopener noreferrer">日内期权交易课</a>
+                <a class="quick-link signal" href="https://tools.xiaoyinsi.com/gex" target="_blank" rel="noopener noreferrer">G0信号</a>
+            </div>
+        </section>
+
+        <section class="summary-grid" aria-label="交易概览">
+            <div class="summary-card">
+                <div class="summary-label">累计盈亏</div>
+                <div class="summary-value" id="totalPnl">$0.00</div>
+                <div class="summary-note" id="totalNote">还没有交易记录</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">今日盈亏</div>
+                <div class="summary-value" id="todayPnl">$0.00</div>
+                <div class="summary-note" id="todayNote">等待今天第一笔</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">胜率</div>
+                <div class="summary-value" id="winRate">0%</div>
+                <div class="summary-note" id="winRateNote">盈利天数 / 已记录天数</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">最新结论</div>
+                <div class="summary-value" id="latestVerdict">-</div>
+                <div class="summary-note" id="latestDate">暂无复盘</div>
+            </div>
+        </section>
+
+        <section class="main-grid">
+            <aside class="panel">
+                <div class="panel-title">
+                    <h2 id="formTitle">新增日内复盘</h2>
+                    <span>Day Trade</span>
+                </div>
+                <div class="panel-body">
+                    <form id="tradeForm" class="form-grid">
+                        <div class="two-col">
+                            <div class="field">
+                                <label for="tradeDate">日期</label>
+                                <input id="tradeDate" type="date" required>
+                            </div>
+                            <div class="field">
+                                <label for="pnl">今日盈亏 USD</label>
+                                <input id="pnl" type="number" step="0.01" placeholder="例如 125.50 或 -80" required>
+                            </div>
+                        </div>
+
+                        <div class="two-col">
+                            <div class="field">
+                                <label for="symbol">标的/合约</label>
+                                <input id="symbol" type="text" placeholder="NVDA 0DTE Call/Put">
+                            </div>
+                            <div class="field">
+                                <label for="direction">方向</label>
+                                <select id="direction">
+                                    <option value="Call">Call</option>
+                                    <option value="Put">Put</option>
+                                    <option value="Call + Put">Call + Put</option>
+                                    <option value="观望">观望</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="two-col">
+                            <div class="field">
+                                <label for="contracts">张数</label>
+                                <input id="contracts" type="number" step="1" min="0" placeholder="0">
+                            </div>
+                            <div class="field">
+                                <label for="qqqMove">当日走势</label>
+                                <select id="qqqMove">
+                                    <option value="趋势上涨">趋势上涨</option>
+                                    <option value="趋势下跌">趋势下跌</option>
+                                    <option value="震荡">震荡</option>
+                                    <option value="冲高回落">冲高回落</option>
+                                    <option value="探底回升">探底回升</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <div class="field-label-row">
+                                <label for="tradeSummary">交易过程</label>
+                                <button type="button" class="voice-btn" data-voice-target="tradeSummary">语音输入</button>
+                            </div>
+                            <textarea id="tradeSummary" placeholder="进场原因、加减仓、离场点、有没有追单"></textarea>
+                        </div>
+
+                        <div class="field">
+                            <div class="field-label-row">
+                                <label for="mindset">心得/情绪</label>
+                                <button type="button" class="voice-btn" data-voice-target="mindset">语音输入</button>
+                            </div>
+                            <textarea id="mindset" placeholder="今天哪里做得好，哪里被情绪带走"></textarea>
+                        </div>
+
+                        <div class="field">
+                            <div class="field-label-row">
+                                <label for="qqqReview">走势复盘</label>
+                                <button type="button" class="voice-btn" data-voice-target="qqqReview">语音输入</button>
+                            </div>
+                            <textarea id="qqqReview" placeholder="开盘、VWAP、关键支撑压力、午后走势"></textarea>
+                        </div>
+
+                        <div class="field">
+                            <div class="field-label-row">
+                                <label for="conclusion">今日结论</label>
+                                <button type="button" class="voice-btn" data-voice-target="conclusion">语音输入</button>
+                            </div>
+                            <textarea id="conclusion" placeholder="明天要保留/停止/加强的一条规则"></textarea>
+                        </div>
+
+                        <div class="action-row">
+                            <button type="submit" id="saveBtn">保存记录</button>
+                            <button type="button" class="ghost" id="resetBtn">清空</button>
+                        </div>
+                    </form>
+
+                    <div class="trade-image-edit-dock" id="tradeImageEditDock"></div>
+
+                    <div class="daily-conclusion-panel">
+                        <div class="daily-conclusion-head">
+                            <h3>每日结论</h3>
+                            <span class="pill" id="dailyConclusionCount">0 天</span>
+                        </div>
+                        <div class="daily-conclusion-list" id="dailyConclusionList"></div>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="panel">
+                <div class="panel-title">
+                    <h2>交易日历</h2>
+                    <span id="recordCount">0 条</span>
+                </div>
+                <div class="panel-body">
+                    <div class="calendar-panel">
+                        <div class="calendar-head">
+                            <h3>每日盈利日历</h3>
+                            <div class="calendar-nav">
+                                <button type="button" class="ghost" id="prevMonthBtn">‹</button>
+                                <div class="calendar-month" id="calendarMonth">-</div>
+                                <button type="button" class="ghost" id="nextMonthBtn">›</button>
+                            </div>
+                        </div>
+                        <div class="calendar-grid" id="profitCalendar"></div>
+                        <div class="calendar-hint">点某一天，打开当天的盈利、亏损、复盘心得、今日结论和交易截图买卖点。</div>
+                    </div>
+
+                    <div class="market-head">
+                        <h3>四宫格复盘</h3>
+                        <span class="pill">最新一笔概览</span>
+                    </div>
+                    <div class="review-grid">
+                        <article class="review-card">
+                            <h3>交易记录</h3>
+                            <p id="latestTrade">还没有记录。保存第一条后，这里会显示最新交易过程。</p>
+                        </article>
+                        <article class="review-card">
+                            <h3>心得情绪</h3>
+                            <p id="latestMindset">记录当天的纪律、冲动、耐心和执行质量。</p>
+                        </article>
+                        <article class="review-card">
+                            <h3>每日复盘</h3>
+                            <p id="latestReview">把盘面和自己的操作对上，找到真正的问题。</p>
+                        </article>
+                        <article class="review-card">
+                            <h3>走势复盘</h3>
+                            <p id="latestQqq">走势类型、关键价位、盘中节奏会显示在这里。</p>
+                        </article>
+                    </div>
+
+                    <div class="market-panel">
+                        <div class="market-head">
+                            <h3>当日交易图</h3>
+                            <span class="pill">长桥 API · 只读行情</span>
+                        </div>
+                        <div class="market-controls">
+                            <div class="field">
+                                <label for="chartSymbol">标的</label>
+                                <input id="chartSymbol" list="symbolOptions" type="text" placeholder="NVDA / META / QQQ">
+                                <datalist id="symbolOptions">
+                                    <option value="NVDA"></option>
+                                    <option value="META"></option>
+                                    <option value="QQQ"></option>
+                                    <option value="TSLA"></option>
+                                    <option value="AAPL"></option>
+                                    <option value="SPY"></option>
+                                </datalist>
+                            </div>
+                            <div class="field">
+                                <label for="chartDate">日期</label>
+                                <input id="chartDate" type="date">
+                            </div>
+                            <div class="field">
+                                <label for="chartInterval">周期</label>
+                                <select id="chartInterval">
+                                    <option value="5min">5分钟</option>
+                                    <option value="1min">1分钟</option>
+                                    <option value="15min">15分钟</option>
+                                    <option value="30min">30分钟</option>
+                                    <option value="60min">60分钟</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label for="longbridgeStatus">数据服务</label>
+                                <input id="longbridgeStatus" type="text" placeholder="服务端配置" disabled>
+                            </div>
+                            <button type="button" class="secondary" id="loadChartBtn">获取图表</button>
+                        </div>
+                        <div class="market-chart-wrap">
+                            <canvas id="marketChart"></canvas>
+                        </div>
+                        <p class="market-status" id="marketStatus">打开长桥数据面板查询行情；本页保留交易复盘，历史分时图暂未接入。</p>
+                    </div>
+
+                    <div class="toolbar">
+                        <input id="searchInput" type="search" placeholder="搜索日期、心得、走势">
+                        <div class="action-row">
+                            <button type="button" class="secondary" id="toggleRecordsBtn">导出/管理明细</button>
+                            <label class="file-button secondary" for="importFile">导入本页</label>
+                            <input id="importFile" class="hidden-file" type="file" accept=".json">
+                        </div>
+                    </div>
+
+                    <div class="records-export-panel" id="recordsExportPanel">
+                        <div class="export-select-actions">
+                            <div class="action-row">
+                                <button type="button" class="ghost" id="selectAllRecordsBtn">全选</button>
+                                <button type="button" class="ghost" id="clearSelectedRecordsBtn">清空选择</button>
+                                <button type="button" class="secondary" id="exportBtn">导出勾选</button>
+                            </div>
+                            <span class="export-selected-count" id="selectedRecordCount">已选 0 条</span>
+                        </div>
+                        <div id="records" class="records export-check-list"></div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <div class="day-detail-modal" id="dayDetailModal" aria-hidden="true">
+        <div class="day-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="dayDetailTitle">
+            <div class="day-detail-head">
+                <h3 id="dayDetailTitle">当日复盘</h3>
+                <button type="button" class="day-detail-close" id="closeDayDetailBtn">关闭</button>
+            </div>
+            <div class="day-detail-body" id="dayDetailBody"></div>
+            <div class="trade-image-modal-dock" id="tradeImageModalDock">
+                <div class="trade-image-panel" id="tradeImagePanel">
+                    <div class="market-head">
+                        <h3>交易截图买卖点</h3>
+                        <span class="pill" id="tradeImageStatus">可粘贴截图</span>
+                    </div>
+                    <div class="trade-image-controls">
+                        <div class="field">
+                            <label for="tradeImageDate">截图日期</label>
+                            <input id="tradeImageDate" type="date">
+                        </div>
+                        <label class="file-button secondary" for="tradeImageFile">上传多张图片</label>
+                        <input id="tradeImageFile" class="hidden-file" type="file" accept="image/*" multiple>
+                        <button type="button" class="ghost" id="clearTradeImageBtn">删除当前图</button>
+                        <button type="button" class="ghost" id="clearAllTradeImagesBtn">清空当天所有图</button>
+                        <button type="button" class="secondary" id="downloadTradeImageBtn">下载复盘图</button>
+                    </div>
+                    <div class="trade-image-paste" id="tradeImagePasteZone" tabindex="0">
+                        <strong>点击这里后直接粘贴当天交易记录截图</strong>
+                        <span>一天可以保存多张截图。也可以把多张图片拖进来，或用“上传多张图片”。选中某张图后，再标买点/卖点。</span>
+                    </div>
+                    <div class="trade-image-gallery" id="tradeImageGallery"></div>
+                    <div class="trade-image-actions">
+                        <button type="button" id="buyMarkerBtn" class="active">买点</button>
+                        <button type="button" id="sellMarkerBtn" class="secondary">卖点</button>
+                        <button type="button" class="ghost" id="undoMarkerBtn">撤销上一点</button>
+                    </div>
+                    <div class="trade-image-stage" id="tradeImageStage">
+                        <canvas id="tradeImageCanvas"></canvas>
+                        <div class="trade-image-empty" id="tradeImageEmpty">
+                            <div>
+                                <strong>还没有当天截图</strong>
+                                <span>把券商成交记录、分时图或复盘截图贴进来，同一天可以放很多张，每张图都会保留自己的买卖点标注。</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="trade-marker-list" id="tradeMarkerList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'intradayOptionsRecords_v1';
+        const TRADE_IMAGE_STORAGE_KEY = 'intradayOptionsTradeImages_v1';
+        const TRADE_IMAGE_DB_NAME = 'sayi_intraday_option_images_db';
+        const TRADE_IMAGE_STORE_NAME = 'images';
+        const MARKET_SETTINGS_KEY = 'intradayOptionsMarketSettings_v1';
+        let records = [];
+        let tradeImages = {};
+        let selectedExportRecordIds = new Set();
+        let recordsPanelOpen = false;
+        let editingId = null;
+        let marketChart = null;
+        let calendarMonthDate = new Date();
+        let selectedCalendarDate = todayString();
+        let tradeImageState = {
+            date: todayString(),
+            imageId: '',
+            imageDataUrl: '',
+            image: null,
+            markers: [],
+            activeType: 'buy'
+        };
+
+        const form = document.getElementById('tradeForm');
+        const fields = {
+            tradeDate: document.getElementById('tradeDate'),
+            pnl: document.getElementById('pnl'),
+            symbol: document.getElementById('symbol'),
+            direction: document.getElementById('direction'),
+            contracts: document.getElementById('contracts'),
+            qqqMove: document.getElementById('qqqMove'),
+            tradeSummary: document.getElementById('tradeSummary'),
+            mindset: document.getElementById('mindset'),
+            qqqReview: document.getElementById('qqqReview'),
+            conclusion: document.getElementById('conclusion')
+        };
+        const tradeImageEls = {
+            date: document.getElementById('tradeImageDate'),
+            file: document.getElementById('tradeImageFile'),
+            pasteZone: document.getElementById('tradeImagePasteZone'),
+            gallery: document.getElementById('tradeImageGallery'),
+            stage: document.getElementById('tradeImageStage'),
+            canvas: document.getElementById('tradeImageCanvas'),
+            status: document.getElementById('tradeImageStatus'),
+            markerList: document.getElementById('tradeMarkerList'),
+            buyBtn: document.getElementById('buyMarkerBtn'),
+            sellBtn: document.getElementById('sellMarkerBtn'),
+            undoBtn: document.getElementById('undoMarkerBtn'),
+            clearBtn: document.getElementById('clearTradeImageBtn'),
+            clearAllBtn: document.getElementById('clearAllTradeImagesBtn'),
+            downloadBtn: document.getElementById('downloadTradeImageBtn')
+        };
+        const voiceButtons = Array.from(document.querySelectorAll('[data-voice-target]'));
+        let voiceRecognition = null;
+        let voiceTargetId = '';
+        let voiceBaseText = '';
+        let voiceIsListening = false;
+
+        function speechRecognitionConstructor() {
+            return window.SpeechRecognition || window.webkitSpeechRecognition;
+        }
+
+        function mergeVoiceText(baseText, spokenText) {
+            const base = String(baseText || '').trimEnd();
+            const spoken = String(spokenText || '').trim();
+            if (!spoken) return base;
+            return base ? base + '\n' + spoken : spoken;
+        }
+
+        function setVoiceButtonState(activeId = '') {
+            voiceButtons.forEach(button => {
+                const isActive = button.dataset.voiceTarget === activeId;
+                button.classList.toggle('listening', isActive);
+                button.textContent = isActive ? '正在听，点我停止' : '语音输入';
+            });
+        }
+
+        function stopVoiceInput() {
+            if (!voiceRecognition) return;
+            try { voiceRecognition.stop(); } catch (error) { console.warn('停止语音输入失败:', error); }
+        }
+
+        function resetVoiceInput() {
+            voiceIsListening = false;
+            voiceRecognition = null;
+            voiceTargetId = '';
+            voiceBaseText = '';
+            setVoiceButtonState('');
+        }
+
+        function startVoiceInput(targetId) {
+            const SpeechRecognition = speechRecognitionConstructor();
+            const target = document.getElementById(targetId);
+            if (!SpeechRecognition || !target) {
+                alert('这个浏览器暂时不支持网页语音输入。可以换 Chrome / Safari，或先用手机键盘自带麦克风。');
+                return;
+            }
+
+            if (voiceIsListening && voiceTargetId === targetId) {
+                stopVoiceInput();
+                return;
+            }
+
+            if (voiceRecognition) {
+                voiceRecognition.onend = null;
+                voiceRecognition.onerror = null;
+                voiceRecognition.onresult = null;
+                try { voiceRecognition.stop(); } catch (error) { console.warn('切换语音输入失败:', error); }
+            }
+
+            voiceTargetId = targetId;
+            voiceBaseText = target.value;
+            voiceIsListening = true;
+            setVoiceButtonState(targetId);
+            target.focus();
+
+            voiceRecognition = new SpeechRecognition();
+            voiceRecognition.lang = 'zh-CN';
+            voiceRecognition.continuous = true;
+            voiceRecognition.interimResults = true;
+            voiceRecognition.maxAlternatives = 1;
+
+            voiceRecognition.onresult = event => {
+                const transcript = Array.from(event.results)
+                    .map(result => result[0]?.transcript || '')
+                    .join('')
+                    .trim();
+                target.value = mergeVoiceText(voiceBaseText, transcript);
+                target.dispatchEvent(new Event('input', { bubbles: true }));
+            };
+
+            voiceRecognition.onerror = event => {
+                if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                    alert('浏览器没有麦克风权限。请允许麦克风后再点“语音输入”。');
+                } else if (event.error !== 'no-speech' && event.error !== 'aborted') {
+                    alert('语音输入中断：' + event.error);
+                }
+            };
+
+            voiceRecognition.onend = resetVoiceInput;
+
+            try {
+                voiceRecognition.start();
+            } catch (error) {
+                resetVoiceInput();
+                alert('语音输入没有启动成功，请再点一次试试。');
+            }
+        }
+
+        function initVoiceInput() {
+            const SpeechRecognition = speechRecognitionConstructor();
+            voiceButtons.forEach(button => {
+                if (!SpeechRecognition) {
+                    button.classList.add('unsupported');
+                    button.disabled = true;
+                    button.textContent = '不支持语音';
+                    button.title = '当前浏览器不支持网页语音输入';
+                    return;
+                }
+                button.addEventListener('click', () => startVoiceInput(button.dataset.voiceTarget));
+            });
+        }
+
+        function tradeImagePanelEl() {
+            return document.getElementById('tradeImagePanel');
+        }
+
+        function isTradeImagePanelVisible() {
+            const panel = tradeImagePanelEl();
+            return Boolean(panel && panel.isConnected && panel.offsetParent !== null);
+        }
+
+        async function dockTradeImagePanel(dockId, date) {
+            const panel = tradeImagePanelEl();
+            const dock = document.getElementById(dockId);
+            if (!panel || !dock) return;
+            if (panel.parentElement !== dock) dock.appendChild(panel);
+            const targetDate = date || todayString();
+            tradeImageEls.date.value = targetDate;
+            await loadTradeImageForDate(targetDate);
+        }
+
+        function showTradeImageForFormDate() {
+            return dockTradeImagePanel('tradeImageEditDock', fields.tradeDate.value || todayString());
+        }
+
+        function showTradeImageForModalDate(date) {
+            return dockTradeImagePanel('tradeImageModalDock', date || todayString());
+        }
+
+        function todayString() {
+            const d = new Date();
+            const pad = n => String(n).padStart(2, '0');
+            return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+        }
+
+        function money(value) {
+            const n = Number(value || 0);
+            return (n < 0 ? '-' : '') + '$' + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function safeParse(raw, fallback) {
+            try { return raw ? JSON.parse(raw) : fallback; } catch (e) { return fallback; }
+        }
+
+        function activeRecords() {
+            return records.filter(record => !record.deleted).sort((a, b) => String(b.tradeDate).localeCompare(String(a.tradeDate)) || b.createdAt - a.createdAt);
+        }
+
+        function monthString(date) {
+            return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0');
+        }
+
+        function dateFromParts(year, monthIndex, day) {
+            return year + '-' + String(monthIndex + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+        }
+
+        function saveData(reason = 'intraday_options_save') {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                version: 1,
+                updatedAt: new Date().toISOString(),
+                records
+            }));
+            if (window.sayiAutoFileBackup) window.sayiAutoFileBackup.schedule(reason);
+        }
+
+        function loadData() {
+            const saved = safeParse(localStorage.getItem(STORAGE_KEY), {});
+            records = Array.isArray(saved) ? saved : (saved.records || []);
+        }
+
+        function createTradeImageId() {
+            return 'image_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+        }
+
+        function openTradeImageDb() {
+            return new Promise((resolve, reject) => {
+                if (!('indexedDB' in window)) {
+                    reject(new Error('当前浏览器不支持大图片本地数据库'));
+                    return;
+                }
+                const request = indexedDB.open(TRADE_IMAGE_DB_NAME, 1);
+                request.onupgradeneeded = () => {
+                    request.result.createObjectStore(TRADE_IMAGE_STORE_NAME);
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error || new Error('图片数据库打开失败'));
+            });
+        }
+
+        async function tradeImageDbSet(key, value) {
+            const db = await openTradeImageDb();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(TRADE_IMAGE_STORE_NAME, 'readwrite');
+                tx.objectStore(TRADE_IMAGE_STORE_NAME).put(value, key);
+                tx.oncomplete = () => { db.close(); resolve(); };
+                tx.onerror = () => { db.close(); reject(tx.error || new Error('图片保存失败')); };
+            });
+        }
+
+        async function tradeImageDbGet(key) {
+            if (!key) return '';
+            const db = await openTradeImageDb();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(TRADE_IMAGE_STORE_NAME, 'readonly');
+                const req = tx.objectStore(TRADE_IMAGE_STORE_NAME).get(key);
+                req.onsuccess = () => resolve(req.result || '');
+                req.onerror = () => reject(req.error || new Error('图片读取失败'));
+                tx.oncomplete = () => db.close();
+            });
+        }
+
+        async function tradeImageDbDelete(key) {
+            if (!key) return;
+            const db = await openTradeImageDb();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(TRADE_IMAGE_STORE_NAME, 'readwrite');
+                tx.objectStore(TRADE_IMAGE_STORE_NAME).delete(key);
+                tx.oncomplete = () => { db.close(); resolve(); };
+                tx.onerror = () => { db.close(); reject(tx.error || new Error('图片删除失败')); };
+            });
+        }
+
+        function normalizeTradeImageItem(item, date, index) {
+            if (!item || typeof item !== 'object') return null;
+            const imageDataUrl = item.imageDataUrl || item.dataUrl || item.src || '';
+            const id = item.id || ('legacy_' + date + '_' + index);
+            const imageKey = item.imageKey || id;
+            if (!imageDataUrl && !imageKey) return null;
+            return {
+                id,
+                imageKey,
+                imageDataUrl,
+                markers: Array.isArray(item.markers) ? item.markers : [],
+                createdAt: item.createdAt || item.updatedAt || Date.now(),
+                updatedAt: item.updatedAt || item.createdAt || Date.now()
+            };
+        }
+
+        function normalizeTradeImages(saved) {
+            const source = saved && saved.images && typeof saved.images === 'object' ? saved.images : saved;
+            if (!source || typeof source !== 'object') return {};
+            const normalized = {};
+            Object.entries(source).forEach(([date, entry]) => {
+                if (!entry) return;
+                let items = [];
+                if (Array.isArray(entry)) {
+                    items = entry.map((item, index) => normalizeTradeImageItem(item, date, index)).filter(Boolean);
+                } else if (Array.isArray(entry.items)) {
+                    items = entry.items.map((item, index) => normalizeTradeImageItem(item, date, index)).filter(Boolean);
+                } else if (Array.isArray(entry.images)) {
+                    items = entry.images.map((item, index) => normalizeTradeImageItem(item, date, index)).filter(Boolean);
+                } else {
+                    const item = normalizeTradeImageItem(entry, date, 0);
+                    if (item) items = [item];
+                }
+                if (items.length) {
+                    normalized[date] = {
+                        date,
+                        items,
+                        updatedAt: entry.updatedAt || items[items.length - 1].updatedAt || new Date().toISOString()
+                    };
+                }
+            });
+            return normalized;
+        }
+
+        function loadTradeImages() {
+            tradeImages = normalizeTradeImages(safeParse(localStorage.getItem(TRADE_IMAGE_STORAGE_KEY), {}));
+        }
+
+        function tradeImagesForStorage() {
+            const packed = {};
+            Object.entries(tradeImages).forEach(([date, day]) => {
+                const items = Array.isArray(day.items) ? day.items.map(item => ({
+                    id: item.id,
+                    imageKey: item.imageKey || item.id,
+                    markers: Array.isArray(item.markers) ? item.markers : [],
+                    createdAt: item.createdAt,
+                    updatedAt: item.updatedAt
+                })) : [];
+                if (items.length) {
+                    packed[date] = {
+                        date,
+                        items,
+                        updatedAt: day.updatedAt || new Date().toISOString()
+                    };
+                }
+            });
+            return packed;
+        }
+
+        function saveTradeImages(reason = 'intraday_options_image_save') {
+            try {
+                localStorage.setItem(TRADE_IMAGE_STORAGE_KEY, JSON.stringify({
+                    version: 2,
+                    storage: 'indexedDB',
+                    updatedAt: new Date().toISOString(),
+                    images: tradeImagesForStorage()
+                }));
+                if (window.sayiAutoFileBackup) window.sayiAutoFileBackup.schedule(reason);
+                if (window.sayiSiteAutoFileBackup) window.sayiSiteAutoFileBackup.schedule(reason);
+            } catch (error) {
+                alert('截图目录保存失败：浏览器本地空间可能太满了。图片本体已经改用大容量数据库保存，可以先导出备份或清理旧浏览器数据后再试。');
+                throw error;
+            }
+        }
+
+        function setTradeImageStatus(message) {
+            tradeImageEls.status.textContent = message;
+        }
+
+        function getTradeImageDay(date, create = false) {
+            const dateKey = date || todayString();
+            if (!tradeImages[dateKey] && create) {
+                tradeImages[dateKey] = { date: dateKey, items: [], updatedAt: new Date().toISOString() };
+            }
+            const day = tradeImages[dateKey];
+            if (!day) return null;
+            if (!Array.isArray(day.items)) {
+                const normalized = normalizeTradeImages({ [dateKey]: day });
+                tradeImages[dateKey] = normalized[dateKey] || { date: dateKey, items: [], updatedAt: new Date().toISOString() };
+            }
+            return tradeImages[dateKey];
+        }
+
+        function getTradeImageItems(date) {
+            const day = getTradeImageDay(date, false);
+            return day && Array.isArray(day.items) ? day.items : [];
+        }
+
+        function getCurrentTradeImageItem() {
+            const items = getTradeImageItems(tradeImageState.date);
+            return items.find(item => item.id === tradeImageState.imageId) || null;
+        }
+
+        async function ensureTradeImageDataUrl(item) {
+            if (!item) return '';
+            if (item.imageDataUrl) return item.imageDataUrl;
+            const dataUrl = await tradeImageDbGet(item.imageKey || item.id).catch(() => '');
+            item.imageDataUrl = dataUrl || '';
+            return item.imageDataUrl;
+        }
+
+        async function hydrateTradeImageDay(date) {
+            const items = getTradeImageItems(date);
+            await Promise.all(items.map(item => ensureTradeImageDataUrl(item)));
+            return items;
+        }
+
+        async function migrateLegacyTradeImagesToDb() {
+            let migrated = false;
+            const tasks = [];
+            Object.values(tradeImages).forEach(day => {
+                (day.items || []).forEach(item => {
+                    if (item.imageDataUrl) {
+                        item.imageKey = item.imageKey || item.id;
+                        tasks.push(tradeImageDbSet(item.imageKey, item.imageDataUrl));
+                        migrated = true;
+                    }
+                });
+            });
+            if (tasks.length) {
+                await Promise.all(tasks);
+                saveTradeImages('intraday_options_image_migrate_indexeddb');
+            } else if (migrated) {
+                saveTradeImages('intraday_options_image_migrate_indexeddb');
+            }
+        }
+
+        function loadImageElement(dataUrl) {
+            return new Promise((resolve, reject) => {
+                const image = new Image();
+                image.onload = () => resolve(image);
+                image.onerror = () => reject(new Error('图片读取失败'));
+                image.src = dataUrl;
+            });
+        }
+
+        function readFileAsDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = event => resolve(event.target.result);
+                reader.onerror = () => reject(reader.error || new Error('文件读取失败'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function compressImageFile(file) {
+            if (!file || !file.type.startsWith('image/')) throw new Error('请选择图片文件');
+            const sourceDataUrl = await readFileAsDataUrl(file);
+            const sourceImage = await loadImageElement(sourceDataUrl);
+            const maxSide = 2200;
+            const scale = Math.min(1, maxSide / Math.max(sourceImage.naturalWidth, sourceImage.naturalHeight));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.max(1, Math.round(sourceImage.naturalWidth * scale));
+            canvas.height = Math.max(1, Math.round(sourceImage.naturalHeight * scale));
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(sourceImage, 0, 0, canvas.width, canvas.height);
+            return canvas.toDataURL('image/jpeg', 0.9);
+        }
+
+        function markerTypeLabel(type) {
+            return type === 'sell' ? '卖点' : '买点';
+        }
+
+        function markerTypeColor(type) {
+            return type === 'sell' ? '#ff4757' : '#00b894';
+        }
+
+        function markerTypeDarkColor(type) {
+            return type === 'sell' ? '#b72136' : '#007e66';
+        }
+
+        function drawRoundedRect(ctx, x, y, width, height, radius) {
+            const r = Math.min(radius, width / 2, height / 2);
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + width - r, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+            ctx.lineTo(x + width, y + height - r);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+            ctx.lineTo(x + r, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+            ctx.lineTo(x, y + r);
+            ctx.quadraticCurveTo(x, y, x + r, y);
+            ctx.closePath();
+        }
+
+        function drawTradeMarker(ctx, marker, index, canvasWidth, canvasHeight) {
+            const x = marker.x * canvasWidth;
+            const y = marker.y * canvasHeight;
+            const color = markerTypeColor(marker.type);
+            const darkColor = markerTypeDarkColor(marker.type);
+            const size = Math.max(18, Math.min(canvasWidth, canvasHeight) * 0.025);
+            const label = (marker.label || markerTypeLabel(marker.type)) + ' ' + index;
+            const labelFont = Math.max(18, Math.min(34, canvasWidth * 0.022));
+            const paddingX = Math.round(labelFont * 0.55);
+            ctx.font = '900 ' + labelFont + 'px "Microsoft YaHei", sans-serif';
+            const labelWidth = Math.max(82, ctx.measureText(label).width + paddingX * 2);
+            const labelHeight = Math.round(labelFont * 1.65);
+            const maxLabelX = Math.max(10, canvasWidth - labelWidth - 10);
+            const maxLabelY = Math.max(10, canvasHeight - labelHeight - 10);
+            const labelX = Math.min(Math.max(10, x + size + 8), maxLabelX);
+            const labelY = marker.type === 'sell'
+                ? Math.min(maxLabelY, Math.max(10, y - labelHeight - size))
+                : Math.min(maxLabelY, Math.max(10, y + size));
+
+            ctx.save();
+            ctx.shadowColor = 'rgba(0,0,0,0.28)';
+            ctx.shadowBlur = 14;
+            ctx.shadowOffsetY = 5;
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            if (marker.type === 'sell') {
+                ctx.moveTo(x, y + size);
+                ctx.lineTo(x - size, y - size * 0.7);
+                ctx.lineTo(x + size, y - size * 0.7);
+            } else {
+                ctx.moveTo(x, y - size);
+                ctx.lineTo(x - size, y + size * 0.7);
+                ctx.lineTo(x + size, y + size * 0.7);
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+
+            ctx.save();
+            ctx.lineWidth = Math.max(2, canvasWidth * 0.002);
+            ctx.strokeStyle = darkColor;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(labelX, labelY + labelHeight / 2);
+            ctx.stroke();
+
+            drawRoundedRect(ctx, labelX, labelY, labelWidth, labelHeight, Math.round(labelHeight / 2));
+            ctx.fillStyle = 'rgba(255,255,255,0.92)';
+            ctx.fill();
+            ctx.lineWidth = Math.max(2, canvasWidth * 0.0014);
+            ctx.strokeStyle = color;
+            ctx.stroke();
+            ctx.fillStyle = darkColor;
+            ctx.font = '900 ' + labelFont + 'px "Microsoft YaHei", sans-serif';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(label, labelX + paddingX, labelY + labelHeight / 2 + 1);
+            ctx.restore();
+        }
+
+        function renderTradeMarkerList() {
+            if (!tradeImageState.imageDataUrl) {
+                tradeImageEls.markerList.innerHTML = '';
+                return;
+            }
+            if (!tradeImageState.markers.length) {
+                tradeImageEls.markerList.innerHTML = '<div class="empty-state">图片已保存。选择“买点”或“卖点”，再点图上的位置。</div>';
+                return;
+            }
+            tradeImageEls.markerList.innerHTML = tradeImageState.markers.map((marker, index) => {
+                const typeText = markerTypeLabel(marker.type);
+                const x = Math.round(marker.x * 1000) / 10;
+                const y = Math.round(marker.y * 1000) / 10;
+                return `
+                    <div class="trade-marker-item ${marker.type}">
+                        <div>
+                            <strong>${typeText} ${index + 1}</strong>
+                            <span>位置：横向 ${x}% / 纵向 ${y}%</span>
+                        </div>
+                        <button type="button" class="ghost" onclick="removeTradeMarker('${marker.id}')">删除</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderTradeImageGallery() {
+            const date = tradeImageState.date || todayString();
+            const items = getTradeImageItems(date);
+            if (!items.length) {
+                tradeImageEls.gallery.innerHTML = '';
+                return;
+            }
+            tradeImageEls.gallery.innerHTML = items.map((item, index) => {
+                const activeClass = item.id === tradeImageState.imageId ? ' active' : '';
+                const markerCount = Array.isArray(item.markers) ? item.markers.length : 0;
+                const imageSrc = item.imageDataUrl || '';
+                return `
+                    <button type="button" class="trade-image-thumb${activeClass}" data-image-id="${escapeHtml(item.id)}">
+                        <img src="${imageSrc}" alt="第 ${index + 1} 张交易截图">
+                        <strong>第 ${index + 1} 张截图</strong>
+                        <span>${markerCount} 个买卖点</span>
+                    </button>
+                `;
+            }).join('');
+            tradeImageEls.gallery.querySelectorAll('[data-image-id]').forEach(button => {
+                button.addEventListener('click', () => selectTradeImage(button.dataset.imageId));
+            });
+        }
+
+        function renderTradeImageCanvas() {
+            const canvas = tradeImageEls.canvas;
+            const ctx = canvas.getContext('2d');
+            const date = tradeImageState.date || todayString();
+            const items = getTradeImageItems(date);
+            if (!tradeImageState.image) {
+                canvas.width = 1000;
+                canvas.height = 560;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                tradeImageEls.stage.classList.remove('has-image');
+                setTradeImageStatus(items.length ? '请选择当天截图' : '今天 0 张图，可粘贴截图');
+                renderTradeImageGallery();
+                renderTradeMarkerList();
+                return;
+            }
+
+            const image = tradeImageState.image;
+            canvas.width = image.naturalWidth;
+            canvas.height = image.naturalHeight;
+            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+            tradeImageState.markers.forEach((marker, index) => drawTradeMarker(ctx, marker, index + 1, canvas.width, canvas.height));
+            tradeImageEls.stage.classList.add('has-image');
+            const activeIndex = Math.max(0, items.findIndex(item => item.id === tradeImageState.imageId));
+            setTradeImageStatus('当天 ' + items.length + ' 张图｜当前第 ' + (activeIndex + 1) + ' 张｜已标注 ' + tradeImageState.markers.length + ' 个点');
+            renderTradeImageGallery();
+            renderTradeMarkerList();
+        }
+
+        async function setActiveTradeImageItem(item) {
+            if (!item) {
+                tradeImageState.imageId = '';
+                tradeImageState.imageDataUrl = '';
+                tradeImageState.image = null;
+                tradeImageState.markers = [];
+                renderTradeImageCanvas();
+                return;
+            }
+            tradeImageState.imageId = item.id;
+            tradeImageState.imageDataUrl = await ensureTradeImageDataUrl(item);
+            tradeImageState.markers = Array.isArray(item.markers) ? item.markers : [];
+            tradeImageState.image = tradeImageState.imageDataUrl ? await loadImageElement(tradeImageState.imageDataUrl).catch(() => null) : null;
+            renderTradeImageCanvas();
+        }
+
+        async function loadTradeImageForDate(date, preferredImageId = '') {
+            const items = await hydrateTradeImageDay(date);
+            const preferred = preferredImageId ? items.find(item => item.id === preferredImageId) : null;
+            const entry = preferred || items[items.length - 1] || null;
+            tradeImageState.date = date;
+            await setActiveTradeImageItem(entry);
+        }
+
+        function persistCurrentTradeImage(reason) {
+            const date = tradeImageEls.date.value || todayString();
+            tradeImageState.date = date;
+            const day = getTradeImageDay(date, true);
+            const item = day.items.find(entry => entry.id === tradeImageState.imageId);
+            if (!item && !tradeImageState.imageDataUrl) {
+                delete tradeImages[date];
+            } else if (item) {
+                item.markers = tradeImageState.markers;
+                item.updatedAt = Date.now();
+                day.updatedAt = new Date().toISOString();
+            }
+            if (day && !day.items.length) {
+                delete tradeImages[date];
+            }
+            saveTradeImages(reason);
+        }
+
+        async function setTradeImageDataUrl(dataUrl, reason = 'intraday_options_image_paste') {
+            const date = tradeImageEls.date.value || todayString();
+            const day = getTradeImageDay(date, true);
+            const item = {
+                id: createTradeImageId(),
+                imageKey: '',
+                imageDataUrl: dataUrl,
+                markers: [],
+                createdAt: Date.now(),
+                updatedAt: Date.now()
+            };
+            item.imageKey = item.id;
+            await tradeImageDbSet(item.imageKey, dataUrl);
+            day.items.push(item);
+            day.updatedAt = new Date().toISOString();
+            saveTradeImages(reason);
+            await loadTradeImageForDate(date, item.id);
+        }
+
+        async function useTradeImageFile(file, reason = 'intraday_options_image_upload') {
+            return useTradeImageFiles([file], reason);
+        }
+
+        async function useTradeImageFiles(files, reason = 'intraday_options_image_upload') {
+            const imageFiles = Array.from(files || []).filter(file => file && file.type.startsWith('image/'));
+            if (!imageFiles.length) return;
+            try {
+                for (let index = 0; index < imageFiles.length; index += 1) {
+                    setTradeImageStatus('正在读取图片 ' + (index + 1) + ' / ' + imageFiles.length + '...');
+                    const dataUrl = await compressImageFile(imageFiles[index]);
+                    await setTradeImageDataUrl(dataUrl, reason);
+                }
+            } catch (error) {
+                alert('图片处理失败：' + error.message);
+                renderTradeImageCanvas();
+            }
+        }
+
+        async function handleTradeImagePaste(event) {
+            const items = Array.from(event.clipboardData?.items || []);
+            const imageItem = items.find(item => item.type && item.type.startsWith('image/'));
+            if (!imageItem) return;
+            event.preventDefault();
+            const file = imageItem.getAsFile();
+            if (file) await useTradeImageFile(file, 'intraday_options_image_paste');
+        }
+
+        function addTradeMarkerFromEvent(event) {
+            if (!tradeImageState.image) {
+                tradeImageEls.pasteZone.focus();
+                setTradeImageStatus('请先粘贴截图');
+                return;
+            }
+            const rect = tradeImageEls.canvas.getBoundingClientRect();
+            const x = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+            const y = Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height));
+            tradeImageState.markers.push({
+                id: 'marker_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+                type: tradeImageState.activeType,
+                x,
+                y,
+                createdAt: Date.now()
+            });
+            persistCurrentTradeImage('intraday_options_marker_add');
+            renderTradeImageCanvas();
+        }
+
+        function setActiveMarkerType(type) {
+            tradeImageState.activeType = type;
+            tradeImageEls.buyBtn.classList.toggle('active', type === 'buy');
+            tradeImageEls.sellBtn.classList.toggle('active', type === 'sell');
+            setTradeImageStatus(type === 'sell' ? '现在点图添加卖点' : '现在点图添加买点');
+        }
+
+        function undoTradeMarker() {
+            if (!tradeImageState.markers.length) return;
+            tradeImageState.markers.pop();
+            persistCurrentTradeImage('intraday_options_marker_undo');
+            renderTradeImageCanvas();
+        }
+
+        window.removeTradeMarker = function(id) {
+            tradeImageState.markers = tradeImageState.markers.filter(marker => marker.id !== id);
+            persistCurrentTradeImage('intraday_options_marker_remove');
+            renderTradeImageCanvas();
+        };
+
+        async function selectTradeImage(imageId) {
+            const item = getTradeImageItems(tradeImageState.date).find(entry => entry.id === imageId);
+            await setActiveTradeImageItem(item || null);
+        }
+
+        async function clearCurrentTradeImage() {
+            const date = tradeImageEls.date.value || todayString();
+            const day = getTradeImageDay(date, false);
+            const item = getCurrentTradeImageItem();
+            if (!day || !item) return;
+            const index = day.items.findIndex(entry => entry.id === item.id);
+            if (!confirm('确定删除 ' + date + ' 的当前这张截图和买卖点吗？')) return;
+            await tradeImageDbDelete(item.imageKey || item.id).catch(error => console.warn('删除截图文件失败:', error));
+            day.items.splice(index, 1);
+            day.updatedAt = new Date().toISOString();
+            if (!day.items.length) delete tradeImages[date];
+            saveTradeImages('intraday_options_image_delete_current');
+            const next = day.items[Math.min(index, day.items.length - 1)] || day.items[day.items.length - 1] || null;
+            await loadTradeImageForDate(date, next?.id || '');
+        }
+
+        async function clearAllTradeImagesForDate() {
+            const date = tradeImageEls.date.value || todayString();
+            const items = getTradeImageItems(date);
+            if (!items.length) return;
+            if (!confirm('确定清空 ' + date + ' 的全部 ' + items.length + ' 张截图和买卖点吗？')) return;
+            await Promise.all(items.map(item => tradeImageDbDelete(item.imageKey || item.id).catch(error => console.warn('删除截图文件失败:', error))));
+            delete tradeImages[date];
+            saveTradeImages('intraday_options_image_clear_date');
+            await loadTradeImageForDate(date);
+        }
+
+        function downloadTradeImage() {
+            if (!tradeImageState.image) {
+                alert('请先粘贴截图并标注买卖点。');
+                return;
+            }
+            renderTradeImageCanvas();
+            const items = getTradeImageItems(tradeImageState.date);
+            const activeIndex = Math.max(0, items.findIndex(item => item.id === tradeImageState.imageId));
+            const link = document.createElement('a');
+            link.href = tradeImageEls.canvas.toDataURL('image/png');
+            link.download = '日内期权买卖点_' + (tradeImageEls.date.value || todayString()) + '_第' + (activeIndex + 1) + '张.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function countTradeImages() {
+            return Object.values(tradeImages).reduce((sum, day) => sum + (Array.isArray(day.items) ? day.items.length : 0), 0);
+        }
+
+        async function tradeImagesWithDataForExport(dateFilter = null) {
+            const exported = {};
+            for (const [date, day] of Object.entries(tradeImages)) {
+                if (dateFilter && !dateFilter.has(date)) continue;
+                const items = [];
+                for (const item of day.items || []) {
+                    const imageDataUrl = await ensureTradeImageDataUrl(item);
+                    if (!imageDataUrl) continue;
+                    items.push({
+                        id: item.id,
+                        imageDataUrl,
+                        markers: Array.isArray(item.markers) ? item.markers : [],
+                        createdAt: item.createdAt,
+                        updatedAt: item.updatedAt
+                    });
+                }
+                if (items.length) {
+                    exported[date] = {
+                        date,
+                        items,
+                        updatedAt: day.updatedAt || new Date().toISOString()
+                    };
+                }
+            }
+            return exported;
+        }
+
+        async function importTradeImagesToDb(importedImages) {
+            const normalized = normalizeTradeImages(importedImages);
+            for (const day of Object.values(normalized)) {
+                for (const item of day.items || []) {
+                    if (item.imageDataUrl) {
+                        item.imageKey = item.imageKey || item.id;
+                        await tradeImageDbSet(item.imageKey, item.imageDataUrl);
+                    }
+                }
+            }
+            return normalized;
+        }
+
+        function initTradeImagePanel() {
+            const latest = activeRecords()[0];
+            const initialDate = fields.tradeDate.value || latest?.tradeDate || todayString();
+            tradeImageEls.date.value = initialDate;
+            tradeImageEls.pasteZone.addEventListener('click', () => tradeImageEls.pasteZone.focus());
+            tradeImageEls.pasteZone.addEventListener('paste', handleTradeImagePaste);
+            tradeImageEls.pasteZone.addEventListener('dragover', event => {
+                event.preventDefault();
+                tradeImageEls.pasteZone.classList.add('drag-over');
+            });
+            tradeImageEls.pasteZone.addEventListener('dragleave', () => tradeImageEls.pasteZone.classList.remove('drag-over'));
+            tradeImageEls.pasteZone.addEventListener('drop', event => {
+                event.preventDefault();
+                tradeImageEls.pasteZone.classList.remove('drag-over');
+                const files = Array.from(event.dataTransfer?.files || []).filter(item => item.type.startsWith('image/'));
+                if (files.length) useTradeImageFiles(files, 'intraday_options_image_drop');
+            });
+            document.addEventListener('paste', event => {
+                if (event.defaultPrevented) return;
+                if (!isTradeImagePanelVisible()) return;
+                const tag = String(event.target?.tagName || '').toLowerCase();
+                if (['input', 'textarea', 'select'].includes(tag) || event.target?.isContentEditable) return;
+                handleTradeImagePaste(event);
+            });
+            tradeImageEls.file.addEventListener('change', event => {
+                const files = Array.from(event.target.files || []);
+                if (files.length) useTradeImageFiles(files, 'intraday_options_image_upload');
+                event.target.value = '';
+            });
+            tradeImageEls.date.addEventListener('change', () => loadTradeImageForDate(tradeImageEls.date.value || todayString()));
+            tradeImageEls.canvas.addEventListener('click', addTradeMarkerFromEvent);
+            tradeImageEls.buyBtn.addEventListener('click', () => setActiveMarkerType('buy'));
+            tradeImageEls.sellBtn.addEventListener('click', () => setActiveMarkerType('sell'));
+            tradeImageEls.undoBtn.addEventListener('click', undoTradeMarker);
+            tradeImageEls.clearBtn.addEventListener('click', clearCurrentTradeImage);
+            tradeImageEls.clearAllBtn.addEventListener('click', clearAllTradeImagesForDate);
+            tradeImageEls.downloadBtn.addEventListener('click', downloadTradeImage);
+            setActiveMarkerType('buy');
+            showTradeImageForFormDate().catch(error => console.warn('截图面板初始化失败:', error));
+        }
+
+        function resetForm() {
+            if (voiceIsListening) stopVoiceInput();
+            editingId = null;
+            form.reset();
+            fields.tradeDate.value = todayString();
+            fields.direction.value = 'Call';
+            fields.qqqMove.value = '趋势上涨';
+            document.getElementById('formTitle').textContent = '新增日内复盘';
+            document.getElementById('saveBtn').textContent = '保存记录';
+            showTradeImageForFormDate().catch(error => console.warn('截图面板重置失败:', error));
+        }
+
+        function formToRecord() {
+            return {
+                id: editingId || 'option_' + Date.now(),
+                tradeDate: fields.tradeDate.value,
+                pnl: Number(fields.pnl.value || 0),
+                symbol: fields.symbol.value.trim(),
+                direction: fields.direction.value,
+                contracts: Number(fields.contracts.value || 0),
+                qqqMove: fields.qqqMove.value,
+                tradeSummary: fields.tradeSummary.value.trim(),
+                mindset: fields.mindset.value.trim(),
+                qqqReview: fields.qqqReview.value.trim(),
+                conclusion: fields.conclusion.value.trim(),
+                createdAt: editingId ? (records.find(r => r.id === editingId)?.createdAt || Date.now()) : Date.now(),
+                updatedAt: Date.now(),
+                deleted: false
+            };
+        }
+
+        function fillForm(record) {
+            if (voiceIsListening) stopVoiceInput();
+            editingId = record.id;
+            fields.tradeDate.value = record.tradeDate || todayString();
+            fields.pnl.value = record.pnl ?? 0;
+            fields.symbol.value = record.symbol || '';
+            fields.direction.value = record.direction || 'Call';
+            fields.contracts.value = record.contracts || '';
+            fields.qqqMove.value = record.qqqMove || '趋势上涨';
+            fields.tradeSummary.value = record.tradeSummary || '';
+            fields.mindset.value = record.mindset || '';
+            fields.qqqReview.value = record.qqqReview || '';
+            fields.conclusion.value = record.conclusion || '';
+            document.getElementById('formTitle').textContent = '编辑日内复盘';
+            document.getElementById('saveBtn').textContent = '保存修改';
+            showTradeImageForFormDate().catch(error => console.warn('截图面板切换失败:', error));
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateSummary(list) {
+            const all = activeRecords();
+            const total = all.reduce((sum, record) => sum + Number(record.pnl || 0), 0);
+            const today = todayString();
+            const todayPnl = all.filter(record => record.tradeDate === today).reduce((sum, record) => sum + Number(record.pnl || 0), 0);
+            const byDate = {};
+            all.forEach(record => { byDate[record.tradeDate] = (byDate[record.tradeDate] || 0) + Number(record.pnl || 0); });
+            const days = Object.values(byDate);
+            const winDays = days.filter(v => v > 0).length;
+            const latest = all[0];
+
+            document.getElementById('totalPnl').textContent = money(total);
+            document.getElementById('totalPnl').style.color = total > 0 ? 'var(--win)' : total < 0 ? 'var(--loss)' : 'var(--dark)';
+            document.getElementById('totalNote').textContent = all.length ? all.length + ' 条记录' : '还没有交易记录';
+            document.getElementById('todayPnl').textContent = money(todayPnl);
+            document.getElementById('todayPnl').style.color = todayPnl > 0 ? 'var(--win)' : todayPnl < 0 ? 'var(--loss)' : 'var(--dark)';
+            document.getElementById('todayNote').textContent = all.some(r => r.tradeDate === today) ? '今天已复盘' : '等待今天第一笔';
+            document.getElementById('winRate').textContent = days.length ? Math.round(winDays / days.length * 100) + '%' : '0%';
+            document.getElementById('winRateNote').textContent = days.length ? winDays + ' 个盈利日 / ' + days.length + ' 个交易日' : '盈利天数 / 已记录天数';
+            document.getElementById('latestVerdict').textContent = latest ? (latest.pnl > 0 ? '赚钱日' : latest.pnl < 0 ? '亏损日' : '打平日') : '-';
+            document.getElementById('latestDate').textContent = latest ? latest.tradeDate + ' | ' + (latest.conclusion || '暂无结论') : '暂无复盘';
+            document.getElementById('recordCount').textContent = list.length + ' 条';
+
+            document.getElementById('latestTrade').textContent = latest ? (latest.tradeSummary || '今天没有填写交易过程。') : '还没有记录。保存第一条后，这里会显示最新交易过程。';
+            document.getElementById('latestMindset').textContent = latest ? (latest.mindset || '今天没有填写心得情绪。') : '记录当天的纪律、冲动、耐心和执行质量。';
+            document.getElementById('latestReview').textContent = latest ? (latest.conclusion || '今天没有填写每日结论。') : '把盘面和自己的操作对上，找到真正的问题。';
+            document.getElementById('latestQqq').textContent = latest ? (latest.qqqMove + '\n' + (latest.qqqReview || '还没有填写走势细节。')) : '走势类型、关键价位、盘中节奏会显示在这里。';
+        }
+
+        function renderRecords() {
+            const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+            const list = activeRecords().filter(record => {
+                const text = [record.tradeDate, record.symbol, record.direction, record.qqqMove, record.tradeSummary, record.mindset, record.qqqReview, record.conclusion].join(' ').toLowerCase();
+                return !keyword || text.includes(keyword);
+            });
+            updateSummary(list);
+            renderProfitCalendar();
+            renderDailyConclusions();
+
+            const container = document.getElementById('records');
+            if (!list.length) {
+                container.innerHTML = recordsPanelOpen ? '<div class="empty-state">暂无匹配记录。今天的盘，等你写下第一句复盘。</div>' : '';
+                updateSelectedRecordCount();
+                return;
+            }
+
+            container.innerHTML = list.map(record => {
+                const pnlClass = record.pnl > 0 ? 'win' : record.pnl < 0 ? 'loss' : 'flat';
+                const pnlText = record.pnl > 0 ? '盈利 ' : record.pnl < 0 ? '亏损 ' : '打平 ';
+                const checked = selectedExportRecordIds.has(record.id) ? 'checked' : '';
+                return `
+                    <label class="export-check-item">
+                        <input type="checkbox" class="record-export-checkbox" value="${escapeHtml(record.id)}" ${checked}>
+                        <div class="export-check-main">
+                            <strong>${escapeHtml(record.tradeDate || '')} | ${escapeHtml(record.symbol || '期权交易')} | ${escapeHtml(record.direction || '-')}</strong>
+                            <span class="pill ${pnlClass}">${pnlText}${money(record.pnl)}</span>
+                            <span>${record.contracts || 0} 张｜走势 ${escapeHtml(record.qqqMove || '-')}</span>
+                        </div>
+                        <div class="export-check-actions">
+                            <button type="button" class="secondary" onclick="event.preventDefault(); event.stopPropagation(); editRecord('${record.id}')">编辑</button>
+                            <button type="button" class="ghost" onclick="event.preventDefault(); event.stopPropagation(); deleteRecord('${record.id}')">删除</button>
+                        </div>
+                    </label>
+                `;
+            }).join('');
+            container.querySelectorAll('.record-export-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    if (checkbox.checked) selectedExportRecordIds.add(checkbox.value);
+                    else selectedExportRecordIds.delete(checkbox.value);
+                    updateSelectedRecordCount();
+                });
+            });
+            updateSelectedRecordCount();
+        }
+
+        function recordsByDate() {
+            return activeRecords().reduce((map, record) => {
+                if (!record.tradeDate) return map;
+                if (!map[record.tradeDate]) map[record.tradeDate] = [];
+                map[record.tradeDate].push(record);
+                return map;
+            }, {});
+        }
+
+        function filteredRecords() {
+            const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+            return activeRecords().filter(record => {
+                const text = [record.tradeDate, record.symbol, record.direction, record.qqqMove, record.tradeSummary, record.mindset, record.qqqReview, record.conclusion].join(' ').toLowerCase();
+                return !keyword || text.includes(keyword);
+            });
+        }
+
+        function updateSelectedRecordCount() {
+            const el = document.getElementById('selectedRecordCount');
+            if (!el) return;
+            const validIds = new Set(activeRecords().map(record => record.id));
+            selectedExportRecordIds = new Set([...selectedExportRecordIds].filter(id => validIds.has(id)));
+            el.textContent = '已选 ' + selectedExportRecordIds.size + ' 条';
+        }
+
+        function setRecordsPanelOpen(open) {
+            recordsPanelOpen = open;
+            document.getElementById('recordsExportPanel').classList.toggle('open', open);
+            document.getElementById('toggleRecordsBtn').textContent = open ? '收起导出明细' : '导出/管理明细';
+            renderRecords();
+        }
+
+        function toggleRecordsPanel() {
+            setRecordsPanelOpen(!recordsPanelOpen);
+        }
+
+        function selectAllFilteredRecords() {
+            filteredRecords().forEach(record => selectedExportRecordIds.add(record.id));
+            setRecordsPanelOpen(true);
+        }
+
+        function clearSelectedRecords() {
+            selectedExportRecordIds.clear();
+            renderRecords();
+        }
+
+        function describeTrade(record) {
+            const symbol = record.symbol || '期权交易';
+            const direction = record.direction || '-';
+            const contracts = Number(record.contracts || 0);
+            return {
+                title: symbol + ' | ' + direction + (contracts ? ' | ' + contracts + '张' : ''),
+                body: money(record.pnl) + (record.qqqMove ? ' | 走势 ' + record.qqqMove : '')
+            };
+        }
+
+        function dayTotal(recordsForDay) {
+            return recordsForDay.reduce((sum, record) => sum + Number(record.pnl || 0), 0);
+        }
+
+        function pnlColor(value) {
+            return value > 0 ? 'var(--win)' : value < 0 ? 'var(--loss)' : 'var(--dark)';
+        }
+
+        function dayRecords(date) {
+            return (recordsByDate()[date] || []).slice().sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+        }
+
+        function renderDailyConclusions() {
+            const listEl = document.getElementById('dailyConclusionList');
+            const countEl = document.getElementById('dailyConclusionCount');
+            if (!listEl || !countEl) return;
+
+            const byDate = recordsByDate();
+            const dates = Object.keys(byDate).sort((a, b) => a.localeCompare(b));
+            countEl.textContent = dates.length + ' 天';
+
+            if (!dates.length) {
+                listEl.innerHTML = '<div class="empty-state">还没有每日结论。保存复盘后，这里会按日期列出来。</div>';
+                return;
+            }
+
+            listEl.innerHTML = dates.map(date => {
+                const items = byDate[date].slice().sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+                const total = dayTotal(items);
+                const conclusions = items.map(item => item.conclusion).filter(Boolean);
+                const conclusionText = conclusions.length ? conclusions.join('\n') : '暂无结论';
+                return `
+                    <button type="button" class="daily-conclusion-item" data-date="${escapeHtml(date)}">
+                        <div class="daily-conclusion-date">
+                            <span>${escapeHtml(date)}</span>
+                            <span style="color:${pnlColor(total)}">${money(total)}</span>
+                        </div>
+                        <div class="daily-conclusion-text">${escapeHtml(conclusionText)}</div>
+                    </button>
+                `;
+            }).join('');
+
+            listEl.querySelectorAll('[data-date]').forEach(button => {
+                button.addEventListener('click', () => openDayDetail(button.dataset.date));
+            });
+        }
+
+        function dayDetailRecordHtml(record, index) {
+            const pnl = Number(record.pnl || 0);
+            const trade = describeTrade(record);
+            const reviewParts = [
+                ['交易过程', record.tradeSummary],
+                ['心得/情绪', record.mindset],
+                ['走势复盘', record.qqqReview],
+                ['今日结论', record.conclusion]
+            ].filter(([, value]) => value);
+            return `
+                <article class="day-detail-record">
+                    <div class="day-detail-record-head">
+                        <span>${index + 1}. ${escapeHtml(trade.title)}</span>
+                        <span style="color:${pnlColor(pnl)}">${money(pnl)}</span>
+                    </div>
+                    <div class="record-meta">
+                        <span class="pill">${record.contracts || 0} 张</span>
+                        <span class="pill">走势 ${escapeHtml(record.qqqMove || '-')}</span>
+                    </div>
+                    ${reviewParts.length ? reviewParts.map(([label, value]) => `
+                        <div class="day-detail-text"><strong>${label}：</strong>${escapeHtml(value)}</div>
+                    `).join('') : '<div class="day-detail-text">这笔还没有写复盘内容。</div>'}
+                </article>
+            `;
+        }
+
+        async function openDayDetail(date) {
+            selectedCalendarDate = date;
+            renderProfitCalendar();
+            const modal = document.getElementById('dayDetailModal');
+            const title = document.getElementById('dayDetailTitle');
+            const body = document.getElementById('dayDetailBody');
+            const items = dayRecords(date);
+            const profitRecords = items.filter(record => Number(record.pnl || 0) > 0);
+            const lossRecords = items.filter(record => Number(record.pnl || 0) < 0);
+            const total = dayTotal(items);
+
+            title.textContent = date + ' 当日复盘';
+            if (!items.length) {
+                body.innerHTML = '<div class="empty-state">这一天还没有交易记录。</div>';
+            } else {
+                body.innerHTML = `
+                    <div class="day-detail-summary">
+                        <div class="day-detail-stat"><span>当日盈亏</span><strong style="color:${pnlColor(total)}">${money(total)}</strong></div>
+                        <div class="day-detail-stat"><span>交易笔数</span><strong>${items.length} 笔</strong></div>
+                        <div class="day-detail-stat"><span>盈利</span><strong style="color:var(--win)">${profitRecords.length} 笔</strong></div>
+                        <div class="day-detail-stat"><span>亏损</span><strong style="color:var(--loss)">${lossRecords.length} 笔</strong></div>
+                    </div>
+                    <section class="day-detail-section">
+                        <h4>盈利 / 亏损明细</h4>
+                        <div class="day-detail-records">
+                            ${items.map((record, index) => dayDetailRecordHtml(record, index)).join('')}
+                        </div>
+                    </section>
+                `;
+            }
+
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+            await showTradeImageForModalDate(date);
+        }
+
+        function closeDayDetail() {
+            const modal = document.getElementById('dayDetailModal');
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+            showTradeImageForFormDate().catch(error => console.warn('截图面板返回编辑区失败:', error));
+        }
+
+        function renderProfitCalendar() {
+            const grid = document.getElementById('profitCalendar');
+            if (!grid) return;
+            const byDate = recordsByDate();
+            const year = calendarMonthDate.getFullYear();
+            const monthIndex = calendarMonthDate.getMonth();
+            const firstDay = new Date(year, monthIndex, 1);
+            const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+            const weekdayOffset = firstDay.getDay();
+            const weekdayLabels = ['日', '一', '二', '三', '四', '五', '六'];
+
+            document.getElementById('calendarMonth').textContent = year + '年' + String(monthIndex + 1).padStart(2, '0') + '月';
+
+            const cells = weekdayLabels.map(day => '<div class="calendar-weekday">' + day + '</div>');
+            for (let i = 0; i < weekdayOffset; i++) cells.push('<div class="calendar-day empty"></div>');
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateKey = dateFromParts(year, monthIndex, day);
+                const dayRecords = byDate[dateKey] || [];
+                const total = dayRecords.reduce((sum, record) => sum + Number(record.pnl || 0), 0);
+                const statusClass = dayRecords.length ? (total > 0 ? 'win' : total < 0 ? 'loss' : 'flat') : '';
+                const statusText = dayRecords.length ? (total > 0 ? '盈' : total < 0 ? '亏' : '平') : '';
+                const selectedClass = dateKey === selectedCalendarDate ? ' selected' : '';
+                cells.push(`
+                    <button type="button" class="calendar-day ${statusClass}${selectedClass}" data-date="${dateKey}">
+                        <div class="calendar-day-number"><span>${day}</span><span>${statusText}</span></div>
+                        <div class="calendar-day-pnl">${dayRecords.length ? money(total) : ''}</div>
+                        <div class="calendar-day-count">${dayRecords.length ? dayRecords.length + '笔' : ''}</div>
+                    </button>
+                `);
+            }
+
+            grid.innerHTML = cells.join('');
+            grid.querySelectorAll('.calendar-day[data-date]').forEach(dayEl => {
+                dayEl.addEventListener('click', () => {
+                    selectedCalendarDate = dayEl.dataset.date;
+                    openDayDetail(dayEl.dataset.date);
+                });
+            });
+        }
+
+        function escapeHtml(text) {
+            return String(text).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+        }
+
+        window.editRecord = function(id) {
+            const record = records.find(item => item.id === id);
+            if (record) fillForm(record);
+        };
+
+        window.deleteRecord = function(id) {
+            if (!confirm('确定删除这条日内期权复盘吗？')) return;
+            const record = records.find(item => item.id === id);
+            if (record) {
+                record.deleted = true;
+                record.updatedAt = Date.now();
+                selectedExportRecordIds.delete(id);
+                saveData('intraday_options_delete');
+                renderRecords();
+            }
+        };
+
+        form.addEventListener('submit', event => {
+            event.preventDefault();
+            const record = formToRecord();
+            const index = records.findIndex(item => item.id === record.id);
+            if (index >= 0) records[index] = record;
+            else records.push(record);
+            saveData();
+            resetForm();
+            renderRecords();
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', resetForm);
+        fields.tradeDate.addEventListener('change', () => {
+            showTradeImageForFormDate().catch(error => console.warn('截图面板日期切换失败:', error));
+        });
+        document.getElementById('searchInput').addEventListener('input', renderRecords);
+        document.getElementById('toggleRecordsBtn').addEventListener('click', toggleRecordsPanel);
+        document.getElementById('selectAllRecordsBtn').addEventListener('click', selectAllFilteredRecords);
+        document.getElementById('clearSelectedRecordsBtn').addEventListener('click', clearSelectedRecords);
+        document.getElementById('closeDayDetailBtn').addEventListener('click', closeDayDetail);
+        document.getElementById('dayDetailModal').addEventListener('click', event => {
+            if (event.target.id === 'dayDetailModal') closeDayDetail();
+        });
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape') closeDayDetail();
+        });
+        document.getElementById('prevMonthBtn').addEventListener('click', () => {
+            calendarMonthDate = new Date(calendarMonthDate.getFullYear(), calendarMonthDate.getMonth() - 1, 1);
+            renderProfitCalendar();
+        });
+        document.getElementById('nextMonthBtn').addEventListener('click', () => {
+            calendarMonthDate = new Date(calendarMonthDate.getFullYear(), calendarMonthDate.getMonth() + 1, 1);
+            renderProfitCalendar();
+        });
+
+        function inferUnderlyingSymbol(text) {
+            const first = String(text || '').trim().toUpperCase().match(/[A-Z.]{1,8}/);
+            return first ? first[0] : 'NVDA';
+        }
+
+        function loadMarketSettings() {
+            const saved = safeParse(localStorage.getItem(MARKET_SETTINGS_KEY), {});
+            const latest = activeRecords()[0];
+            document.getElementById('chartSymbol').value = saved.symbol || inferUnderlyingSymbol(latest?.symbol);
+            document.getElementById('chartDate').value = saved.date || latest?.tradeDate || todayString();
+            document.getElementById('chartInterval').value = saved.interval || '5min';
+            document.getElementById('longbridgeStatus').value = '配置保存在服务端环境变量';
+        }
+
+        function saveMarketSettings() {
+            const settings = {
+                symbol: document.getElementById('chartSymbol').value.trim().toUpperCase(),
+                date: document.getElementById('chartDate').value,
+                interval: document.getElementById('chartInterval').value
+            };
+            localStorage.setItem(MARKET_SETTINGS_KEY, JSON.stringify(settings));
+            return settings;
+        }
+
+        function setMarketStatus(message) {
+            document.getElementById('marketStatus').textContent = message;
+        }
+
+        function renderMarketChart(symbol, date, interval, points) {
+            const ctx = document.getElementById('marketChart');
+            const labels = points.map(point => point.time.slice(11, 16));
+            const closes = points.map(point => point.close);
+            const first = closes[0];
+            const last = closes[closes.length - 1];
+            const lineColor = last >= first ? '#00b894' : '#ff4757';
+
+            if (marketChart) marketChart.destroy();
+            marketChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: symbol + ' ' + date + ' ' + interval,
+                        data: closes,
+                        borderColor: lineColor,
+                        backgroundColor: lineColor + '22',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        tension: 0.25,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { labels: { color: '#333', font: { weight: 'bold' } } },
+                        tooltip: {
+                            callbacks: {
+                                label: context => '收盘价 $' + Number(context.parsed.y).toFixed(2)
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#667', maxTicksLimit: 8 }, grid: { color: 'rgba(0,0,0,0.04)' } },
+                        y: { ticks: { color: '#667' }, grid: { color: 'rgba(0,0,0,0.06)' } }
+                    }
+                }
+            });
+        }
+
+        async function loadMarketChart() {
+            saveMarketSettings();
+            setMarketStatus('行情仅通过长桥 API 获取。请启动长桥网关并打开“长桥数据”，查询正股或期权行情。本复盘页暂未接入历史分时图。');
+        }
+
+        document.getElementById('loadChartBtn').addEventListener('click', loadMarketChart);
+        ['chartSymbol', 'chartDate', 'chartInterval', 'longbridgeStatus'].forEach(id => {
+            document.getElementById(id).addEventListener('change', saveMarketSettings);
+        });
+
+        document.getElementById('exportBtn').addEventListener('click', async () => {
+            try {
+                const selectedRecords = activeRecords().filter(record => selectedExportRecordIds.has(record.id));
+                if (!selectedRecords.length) {
+                    alert('请先在“导出/管理明细”里勾选要导出的记录。');
+                    setRecordsPanelOpen(true);
+                    return;
+                }
+                const exportDates = new Set(selectedRecords.map(record => record.tradeDate).filter(Boolean));
+                const exportImages = await tradeImagesWithDataForExport(exportDates);
+                const payload = {
+                    app: 'sayi-invest-toolbox',
+                    module: 'intraday-options',
+                    exportTime: new Date().toISOString(),
+                    data: { records: selectedRecords, tradeImages: exportImages }
+                };
+                const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = '日内期权交易记录_勾选' + selectedRecords.length + '条_' + todayString() + '.json';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                alert('导出失败：' + error.message);
+            }
+        });
+
+        document.getElementById('importFile').addEventListener('change', event => {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async e => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    const importedRecords = imported.records || imported.data?.records || [];
+                    if (!Array.isArray(importedRecords)) throw new Error('没有识别到日内期权记录');
+                    const importedImages = imported.tradeImages || imported.images || imported.data?.tradeImages || imported.data?.images || {};
+                    records = importedRecords;
+                    tradeImages = await importTradeImagesToDb(importedImages);
+                    saveData('intraday_options_import');
+                    saveTradeImages('intraday_options_image_import');
+                    renderRecords();
+                    await loadTradeImageForDate(tradeImageEls.date.value || todayString());
+                    alert('导入完成，共 ' + activeRecords().length + ' 条记录，' + countTradeImages() + ' 张截图。');
+                } catch (error) {
+                    alert('导入失败：' + error.message);
+                } finally {
+                    event.target.value = '';
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        async function initPage() {
+            loadData();
+            loadTradeImages();
+            await migrateLegacyTradeImagesToDb().catch(error => console.warn('旧截图迁移失败:', error));
+            const latestRecord = activeRecords()[0];
+            if (latestRecord?.tradeDate) {
+                selectedCalendarDate = latestRecord.tradeDate;
+                calendarMonthDate = new Date(latestRecord.tradeDate + 'T00:00:00');
+            }
+            resetForm();
+            renderRecords();
+            initTradeImagePanel();
+            initVoiceInput();
+            loadMarketSettings();
+        }
+
+        initPage();
+    </script>
+</body>
+</html>
